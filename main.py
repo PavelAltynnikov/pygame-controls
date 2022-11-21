@@ -3,7 +3,7 @@ import pygame
 from abc import ABC, abstractmethod
 
 pygame.init()
-pygame.key.set_repeat(1)
+pygame.key.set_repeat(500)
 
 
 class Character:
