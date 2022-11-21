@@ -12,10 +12,39 @@ pygame.key.set_repeat(1)
 pygame.display.set_caption(SCREEN_CAPTION)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-surface = pygame.Surface((100, 100))
-surface.fill(RED_COLOR)
-rect = surface.get_rect()
-rect.center = (300, 300)
+
+class Character:
+    def __init__(self):
+        self.surface = pygame.Surface((100, 100))
+        self.surface.fill(RED_COLOR)
+        self.rect = self.surface.get_rect()
+        self.rect.center = (300, 300)
+
+    def move(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RIGHT] and keys[pygame.K_UP]:
+            self.rect.x += 1
+            self.rect.y -= 1
+        elif keys[pygame.K_RIGHT] and keys[pygame.K_DOWN]:
+            self.rect.x += 1
+            self.rect.y += 1
+        elif keys[pygame.K_LEFT] and keys[pygame.K_UP]:
+            self.rect.x -= 1
+            self.rect.y -= 1
+        elif keys[pygame.K_LEFT] and keys[pygame.K_DOWN]:
+            self.rect.x -= 1
+            self.rect.y += 1
+        elif keys[pygame.K_RIGHT]:
+            self.rect.x += 1
+        elif keys[pygame.K_LEFT]:
+            self.rect.x -= 1
+        elif keys[pygame.K_UP]:
+            self.rect.y -= 1
+        elif keys[pygame.K_DOWN]:
+            self.rect.y += 1
+
+    def draw(self, screen):
+        screen.blit(self.surface, self.rect)
 
 
 def is_quit(event):
@@ -32,38 +61,17 @@ def event_handler():
             pygame.display.quit()
 
 
-def user_moving():
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_RIGHT] and keys[pygame.K_UP]:
-        rect.x += 1
-        rect.y -= 1
-    elif keys[pygame.K_RIGHT] and keys[pygame.K_DOWN]:
-        rect.x += 1
-        rect.y += 1
-    elif keys[pygame.K_LEFT] and keys[pygame.K_UP]:
-        rect.x -= 1
-        rect.y -= 1
-    elif keys[pygame.K_LEFT] and keys[pygame.K_DOWN]:
-        rect.x -= 1
-        rect.y += 1
-    elif keys[pygame.K_RIGHT]:
-        rect.x += 1
-    elif keys[pygame.K_LEFT]:
-        rect.x -= 1
-    elif keys[pygame.K_UP]:
-        rect.y -= 1
-    elif keys[pygame.K_DOWN]:
-        rect.y += 1
-
-
-def show_window():
+def show_window(character):
     while True:
         event_handler()
-        user_moving()
+        character.move()
+
         screen.fill(GREEN_COLOR)
-        screen.blit(surface, rect)
+        character.draw(screen)
+
         pygame.display.update()
 
 
 if __name__ == '__main__':
-    show_window()
+    character = Character()
+    show_window(character)
