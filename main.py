@@ -94,6 +94,21 @@ class GameWindow(Window):
             pygame.display.update()
 
 
+class SettingWindow(Window):
+    def __init__(self, caption, size):
+        super().__init__(caption, size)
+
+    def show(self):
+        blue_color = (0, 49, 83)
+        while self._is_showing:
+            events = pygame.event.get()
+            self._quit_if_user_wants_to_close_window(events)
+
+            self._screen.fill(blue_color)
+
+            pygame.display.update()
+
+
 if __name__ == '__main__':
     window = GameWindow(
         caption='Controls tests',
