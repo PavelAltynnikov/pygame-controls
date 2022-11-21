@@ -25,8 +25,8 @@ def is_quit(event):
     )
 
 
-def event_handler(rect, is_quit, events):
-
+def event_handler():
+    events = pygame.event.get()
     for event in events:
         if is_quit(event):
             pygame.display.quit()
@@ -58,8 +58,7 @@ def user_moving():
 
 def show_window():
     while True:
-        events = pygame.event.get()
-        event_handler(rect, is_quit, events)
+        event_handler()
         user_moving()
         screen.fill(GREEN_COLOR)
         screen.blit(surface, rect)
