@@ -1,22 +1,13 @@
 import pygame
 
-
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 500
-SCREEN_CAPTION = 'Controls tests'
-GREEN_COLOR = (30, 89, 89)
-RED_COLOR = (250, 50, 50)
-
 pygame.init()
 pygame.key.set_repeat(1)
-pygame.display.set_caption(SCREEN_CAPTION)
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
 class Character:
     def __init__(self):
         self.surface = pygame.Surface((100, 100))
-        self.surface.fill(RED_COLOR)
+        self.surface.fill((250, 50, 50))
         self.rect = self.surface.get_rect()
         self.rect.center = (300, 300)
 
@@ -47,31 +38,41 @@ class Character:
         screen.blit(self.surface, self.rect)
 
 
-def is_quit(event):
-    return (
-        event.type == pygame.QUIT
-        or (event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_q))
-    )
+class Window:
+    def __init__(self, caption, size, character):
+        pygame.display.set_caption(caption)
+        self._screen = pygame.display.set_mode(size)
+        self._character = character
 
+    @staticmethod
+    def _is_quit(event):
+        return (
+            event.type == pygame.QUIT
+            or (event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_q))
+        )
 
-def event_handler():
-    events = pygame.event.get()
-    for event in events:
-        if is_quit(event):
-            pygame.display.quit()
+    def _event_handler(self):
+        events = pygame.event.get()
+        for event in events:
+            if self._is_quit(event):
+                pygame.display.quit()
 
+    def show(self):
+        green_color = (30, 89, 89)
+        while True:
+            self._event_handler()
+            self._character.move()
 
-def show_window(character):
-    while True:
-        event_handler()
-        character.move()
+            self._screen.fill(green_color)
+            self._character.draw(self._screen)
 
-        screen.fill(GREEN_COLOR)
-        character.draw(screen)
-
-        pygame.display.update()
+            pygame.display.update()
 
 
 if __name__ == '__main__':
-    character = Character()
-    show_window(character)
+    window = Window(
+        caption='Controls tests',
+        size=(1000, 500),
+        character=Character()
+    )
+    window.show()
