@@ -26,25 +26,41 @@ def is_quit(event):
 
 
 def event_handler(rect, is_quit, events):
+
     for event in events:
-        # print(event.type)
         if is_quit(event):
             pygame.display.quit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                rect.x += 1
-            elif event.key == pygame.K_LEFT:
-                rect.x -= 1
-            elif event.key == pygame.K_UP:
-                rect.y -= 1
-            elif event.key == pygame.K_DOWN:
-                rect.y += 1
+
+
+def user_moving():
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_RIGHT] and keys[pygame.K_UP]:
+        rect.x += 1
+        rect.y -= 1
+    elif keys[pygame.K_RIGHT] and keys[pygame.K_DOWN]:
+        rect.x += 1
+        rect.y += 1
+    elif keys[pygame.K_LEFT] and keys[pygame.K_UP]:
+        rect.x -= 1
+        rect.y -= 1
+    elif keys[pygame.K_LEFT] and keys[pygame.K_DOWN]:
+        rect.x -= 1
+        rect.y += 1
+    elif keys[pygame.K_RIGHT]:
+        rect.x += 1
+    elif keys[pygame.K_LEFT]:
+        rect.x -= 1
+    elif keys[pygame.K_UP]:
+        rect.y -= 1
+    elif keys[pygame.K_DOWN]:
+        rect.y += 1
 
 
 def show_window():
     while True:
         events = pygame.event.get()
         event_handler(rect, is_quit, events)
+        user_moving()
         screen.fill(GREEN_COLOR)
         screen.blit(surface, rect)
         pygame.display.update()
