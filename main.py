@@ -1,5 +1,7 @@
 import pygame
 
+from abc import ABC, abstractmethod
+
 pygame.init()
 pygame.key.set_repeat(1)
 
@@ -38,9 +40,7 @@ class Character:
         screen.blit(self.surface, self.rect)
 
 
-class Window:
-    def __init__(self, caption, size, character):
-        pygame.display.set_caption(caption)
+class Window(ABC):
         self._screen = pygame.display.set_mode(size)
         self._character = character
 
