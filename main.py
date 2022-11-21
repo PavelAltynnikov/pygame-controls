@@ -68,14 +68,24 @@ class Window(ABC):
         self._is_showing = False
 
 
+class GameWindow(Window):
+    def __init__(self, caption, size, character):
+        super().__init__(caption, size)
+        self._character = character
+
+    def _open_settings_window_if_needed(self, events):
         for event in events:
-            if self._is_quit(event):
-                pygame.display.quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                settings = SettingWindow(f'{self._caption} | Settings', self._size)
+                settings.show()
 
     def show(self):
         green_color = (30, 89, 89)
-        while True:
-            self._event_handler()
+        while self._is_showing:
+            events = pygame.event.get()
+            self._quit_if_user_wants_to_close_window(events)
+            self._open_settings_window_if_needed(events)
+
             self._character.move()
 
             self._screen.fill(green_color)
@@ -85,7 +95,7 @@ class Window(ABC):
 
 
 if __name__ == '__main__':
-    window = Window(
+    window = GameWindow(
         caption='Controls tests',
         size=(1000, 500),
         character=Character()
