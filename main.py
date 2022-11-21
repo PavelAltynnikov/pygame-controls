@@ -41,18 +41,33 @@ class Character:
 
 
 class Window(ABC):
+    def __init__(self, caption, size):
+        self._caption = caption
+        self._size = size
         self._screen = pygame.display.set_mode(size)
-        self._character = character
+        self._is_showing = True
+        pygame.display.set_caption(caption)
 
     @staticmethod
-    def _is_quit(event):
+    def _quit_button_is_pressed(event):
         return (
             event.type == pygame.QUIT
             or (event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_q))
         )
 
-    def _event_handler(self):
-        events = pygame.event.get()
+    def _quit_if_user_wants_to_close_window(self, events):
+        for event in events:
+            if self._quit_button_is_pressed(event):
+                self.quit()
+
+    @abstractmethod
+    def show(self):
+        pass
+
+    def quit(self):
+        self._is_showing = False
+
+
         for event in events:
             if self._is_quit(event):
                 pygame.display.quit()
