@@ -116,6 +116,11 @@ class Label(Control):
         screen.blit(self._surface, self.location)
 
 
+class Key(Label):
+    def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
+        super().__init__(font, text, antialias, color, location)
+
+
 class SettingWindow(Window):
     def __init__(self, caption, size):
         super().__init__(caption, size)
