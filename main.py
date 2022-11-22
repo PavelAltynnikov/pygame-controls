@@ -108,6 +108,31 @@ class Label:
 class SettingWindow(Window):
     def __init__(self, caption, size):
         super().__init__(caption, size)
+        self._controls = []
+        self._initialize_components()
+
+    def _initialize_components(self):
+        font = pygame.font.SysFont('Consolas', 25)
+
+        label_right = Label(font, 'right')
+        label_right.location = (50, 50)
+        self._controls.append(label_right)
+
+        label_left = Label(font, 'left')
+        label_left.location = (50, 80)
+        self._controls.append(label_left)
+
+        label_up = Label(font, 'up')
+        label_up.location = (50, 110)
+        self._controls.append(label_up)
+
+        label_down = Label(font, 'down')
+        label_down.location = (50, 140)
+        self._controls.append(label_down)
+
+    def _draw(self):
+        for control in self._controls:
+            control.draw(self._screen)
 
     def show(self):
         blue_color = (0, 49, 83)
@@ -116,6 +141,7 @@ class SettingWindow(Window):
             self._quit_if_user_wants_to_close_window(events)
 
             self._screen.fill(blue_color)
+            self._draw()
 
             pygame.display.update()
 
