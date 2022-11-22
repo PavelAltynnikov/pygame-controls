@@ -96,6 +96,15 @@ class GameWindow(Window):
             pygame.display.update()
 
 
+class Label:
+    def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
+        self._surface = font.render(text, antialias, color, ) 
+        self.location = location
+
+    def draw(self, screen):
+        screen.blit(self._surface, self.location)
+
+
 class SettingWindow(Window):
     def __init__(self, caption, size):
         super().__init__(caption, size)
