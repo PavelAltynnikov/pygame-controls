@@ -215,9 +215,11 @@ class SettingWindow(Window):
 
 
 if __name__ == '__main__':
-    window = GameWindow(
-        caption='Controls tests',
-        size=(1000, 500),
-        character=Character(settings.UserControlSettings())
-    )
-    window.show()
+    # window = GameWindow(
+    #     caption='Controls tests',
+    #     size=(1000, 500),
+    #     character=Character(settings.UserControlSettings())
+    # )
+    # window.show()
+    sw = SettingWindow("settings", (1000, 500))
+    sw.show()
