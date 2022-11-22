@@ -1,4 +1,5 @@
 import pygame
+import settings
 
 from abc import ABC, abstractmethod
 
@@ -7,33 +8,34 @@ pygame.key.set_repeat(500)
 
 
 class Character:
-    def __init__(self):
+    def __init__(self, control: settings.UserControlSettings):
         self.surface = pygame.Surface((100, 100))
         self.surface.fill((250, 50, 50))
         self.rect = self.surface.get_rect()
         self.rect.center = (300, 300)
+        self._control = control
 
     def move(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_RIGHT] and keys[pygame.K_UP]:
+        if keys[self._control.move_right] and keys[self._control.move_up]:
             self.rect.x += 1
             self.rect.y -= 1
-        elif keys[pygame.K_RIGHT] and keys[pygame.K_DOWN]:
+        elif keys[self._control.move_right] and keys[self._control.move_down]:
             self.rect.x += 1
             self.rect.y += 1
-        elif keys[pygame.K_LEFT] and keys[pygame.K_UP]:
+        elif keys[self._control.move_left] and keys[self._control.move_up]:
             self.rect.x -= 1
             self.rect.y -= 1
-        elif keys[pygame.K_LEFT] and keys[pygame.K_DOWN]:
+        elif keys[self._control.move_left] and keys[self._control.move_down]:
             self.rect.x -= 1
             self.rect.y += 1
-        elif keys[pygame.K_RIGHT]:
+        elif keys[self._control.move_right]:
             self.rect.x += 1
-        elif keys[pygame.K_LEFT]:
+        elif keys[self._control.move_left]:
             self.rect.x -= 1
-        elif keys[pygame.K_UP]:
+        elif keys[self._control.move_up]:
             self.rect.y -= 1
-        elif keys[pygame.K_DOWN]:
+        elif keys[self._control.move_down]:
             self.rect.y += 1
 
     def draw(self, screen):
@@ -113,6 +115,6 @@ if __name__ == '__main__':
     window = GameWindow(
         caption='Controls tests',
         size=(1000, 500),
-        character=Character()
+        character=Character(settings.UserControlSettings())
     )
     window.show()
