@@ -96,6 +96,16 @@ class GameWindow(Window):
             pygame.display.update()
 
 
+class Control(ABC):
+    def __init__(self, location=(0, 0)):
+        self.location = location
+        self.is_active = False
+
+    @abstractmethod
+    def draw(self, screen):
+        pass
+
+
 class Label:
     def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
         self._surface = font.render(text, antialias, color)
