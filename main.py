@@ -157,27 +157,26 @@ class RowSetting(Control):
 class SettingWindow(Window):
     def __init__(self, caption, size):
         super().__init__(caption, size)
-        self._controls = []
+        self._controls: list[RowSetting] = []
         self._initialize_components()
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
 
-        label_right = Label(font, 'right')
-        label_right.location = (50, 50)
-        self._controls.append(label_right)
+        right_setting = RowSetting(Label(font, 'right'), Key(font, ">"), location=(50, 50))
+        right_setting.activate(True)
+        self._controls.append(right_setting)
 
-        label_left = Label(font, 'left')
-        label_left.location = (50, 80)
-        self._controls.append(label_left)
+        left_setting = RowSetting(Label(font, 'left'), Key(font, "<"), location=(50, 80))
+        self._controls.append(left_setting)
 
-        label_up = Label(font, 'up')
-        label_up.location = (50, 110)
-        self._controls.append(label_up)
+        up_setting = RowSetting(Label(font, 'up'), Key(font, "^"), location=(50, 110))
+        self._controls.append(up_setting)
 
-        label_down = Label(font, 'down')
-        label_down.location = (50, 140)
-        self._controls.append(label_down)
+        down_setting = RowSetting(Label(font, 'down'), Key(font, "v"), location=(50, 140))
+        self._controls.append(down_setting)
+
+        self._selected_item_index = 0
 
     def _draw(self):
         for control in self._controls:
