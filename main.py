@@ -98,7 +98,7 @@ class GameWindow(Window):
 
 class Label:
     def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
-        self._surface = font.render(text, antialias, color, ) 
+        self._surface = font.render(text, antialias, color)
         self.location = location
 
     def draw(self, screen):
