@@ -106,8 +106,9 @@ class Control(ABC):
         pass
 
 
-class Label:
+class Label(Control):
     def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
+        super().__init__(location)
         self._surface = font.render(text, antialias, color)
         self.location = location
 
