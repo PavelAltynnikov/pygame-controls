@@ -121,6 +121,19 @@ class Key(Label):
         super().__init__(font, text, antialias, color, location)
 
 
+class ActiveFlag(Control):
+    def __init__(self, location=(0, 0), size=(1, 1), color=(0, 0, 0)):
+        super().__init__(location)
+        self._surface = pygame.Surface(size)
+        self._surface.fill(color)
+        self._rect = self._surface.get_rect()
+        self._rect.center = location
+
+    def draw(self, screen):
+        if self.is_active:
+            screen.blit(self._surface, self._rect)
+
+
 class SettingWindow(Window):
     def __init__(self, caption, size):
         super().__init__(caption, size)
