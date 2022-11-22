@@ -134,6 +134,26 @@ class ActiveFlag(Control):
             screen.blit(self._surface, self._rect)
 
 
+class RowSetting(Control):
+    def __init__(self, label: Control, key: Control, location=(0, 0)):
+        super().__init__(location)
+        flag = ActiveFlag(location=(location[0], location[1] + 10), size=(10, 10))
+
+        label.location = (location[0] + 10, location[1])
+        key.location = (location[0] + 150, location[1])
+
+        self._controls: list[Control] = [label, key, flag]
+
+    def activate(self, is_active):
+        self._is_active = is_active
+        for component in self._controls:
+            component.is_active = is_active
+
+    def draw(self, screen):
+        for component in self._controls:
+            component.draw(screen)
+
+
 class SettingWindow(Window):
     def __init__(self, caption, size):
         super().__init__(caption, size)
