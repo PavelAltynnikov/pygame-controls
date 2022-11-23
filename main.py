@@ -123,6 +123,9 @@ class Key(Label):
     def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
         super().__init__(font, text, antialias, color, location)
 
+    def change_text(self, value):
+        self._surface = self._font.render(value, self._antialias, self._color)
+
 
 class ActiveFlag(Control):
     def __init__(self, location=(0, 0), size=(1, 1), color=(0, 0, 0)):
