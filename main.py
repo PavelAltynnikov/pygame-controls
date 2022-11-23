@@ -141,13 +141,15 @@ class ActiveFlag(Control):
 
 
 class RowSetting(Control):
-    def __init__(self, label: Control, key: Control, location=(0, 0)):
+    def __init__(self, label: Label, key: Key, location=(0, 0)):
         super().__init__(location)
         flag = ActiveFlag(location=(location[0], location[1] + 10), size=(10, 10))
 
         label.location = (location[0] + 10, location[1])
         key.location = (location[0] + 150, location[1])
 
+        self.label = label
+        self.key = key
         self._controls: list[Control] = [label, key, flag]
 
     def activate(self, is_active):
