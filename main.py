@@ -190,7 +190,7 @@ class SettingWindow(Window):
         for control in self._controls:
             control.draw(self._screen)
 
-    def _change_setting(self, events):
+    def _change_active_setting(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN:
@@ -233,7 +233,7 @@ class SettingWindow(Window):
         while self._is_showing:
             events = pygame.event.get()
             self._quit_if_user_wants_to_close_window(events)
-            self._change_setting(events)
+            self._change_active_setting(events)
 
             self._screen.fill(blue_color)
             self._draw()
