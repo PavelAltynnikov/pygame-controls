@@ -209,6 +209,25 @@ class SettingWindow(Window):
                     else:
                         setting.activate(False)
 
+    def _change_key_value(self, event):
+        if event.type != pygame.KEYDOWN:
+            return
+        if event.key != pygame.K_RETURN:
+            return
+
+        while True:
+            for event in pygame.event.get():
+                if event.type != pygame.KEYDOWN:
+                    continue
+                if event.key == pygame.K_ESCAPE:
+                    return
+                # TODO: Добавить список возможных клавиш для назначения
+                else:
+                    self._controls[self._selected_item_index] \
+                        .key \
+                        .change_text(pygame.key.name(event.key))
+                    return
+
     def show(self):
         blue_color = (0, 49, 83)
         while self._is_showing:
