@@ -54,7 +54,7 @@ class Window(ABC):
     def _quit_button_is_pressed(event):
         return (
             event.type == pygame.QUIT
-            or (event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_q))
+            or (event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, ))
         )
 
     def _quit_if_user_wants_to_close_window(self, events):
