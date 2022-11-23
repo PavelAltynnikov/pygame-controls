@@ -109,6 +109,9 @@ class Control(ABC):
 class Label(Control):
     def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
         super().__init__(location)
+        self._font = font
+        self._antialias = antialias
+        self._color = color
         self._surface = font.render(text, antialias, color)
         self.location = location
 
