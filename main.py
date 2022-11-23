@@ -190,24 +190,28 @@ class SettingWindow(Window):
         for control in self._controls:
             control.draw(self._screen)
 
-    def _change_active_setting(self, events):
+    def _event_handler(self, events):
         for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    self._selected_item_index += 1
-                    if self._selected_item_index >= len(self._controls):
-                        self._selected_item_index = 0
-                elif event.key == pygame.K_UP:
-                    self._selected_item_index -= 1
-                    if self._selected_item_index < 0:
-                        self._selected_item_index = len(self._controls) - 1
+            self._change_active_setting(event)
+            self._change_key_value(event)
+
+    def _change_active_setting(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                self._selected_item_index += 1
+                if self._selected_item_index >= len(self._controls):
+                    self._selected_item_index = 0
+            elif event.key == pygame.K_UP:
+                self._selected_item_index -= 1
+                if self._selected_item_index < 0:
+                    self._selected_item_index = len(self._controls) - 1
+            else:
+                return
+            for i, setting in enumerate(self._controls):
+                if i == self._selected_item_index:
+                    setting.activate(True)
                 else:
-                    return
-                for i, setting in enumerate(self._controls):
-                    if i == self._selected_item_index:
-                        setting.activate(True)
-                    else:
-                        setting.activate(False)
+                    setting.activate(False)
 
     def _change_key_value(self, event):
         if event.type != pygame.KEYDOWN:
@@ -233,7 +237,7 @@ class SettingWindow(Window):
         while self._is_showing:
             events = pygame.event.get()
             self._quit_if_user_wants_to_close_window(events)
-            self._change_active_setting(events)
+            self._event_handler(events)
 
             self._screen.fill(blue_color)
             self._draw()
