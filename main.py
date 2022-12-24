@@ -126,6 +126,40 @@ class Key(Label):
     def change_text(self, value):
         self._surface: pygame.Surface = self._font.render(value, self._antialias, self._color)
 
+    def wait_for_user_input(self, screen):
+        # TODO: тут дохера логики,
+        # и ивенты, и черчение рамки и апдейт экрана.
+        # Надо подумать как это сделать лаконичней.
+        while True:
+            for event in pygame.event.get():
+                if event.type != pygame.KEYDOWN:
+                    continue
+                if event.key == pygame.K_ESCAPE:
+                    return
+                # TODO: Добавить список возможных клавиш для назначения
+                else:
+                    self.change_text(pygame.key.name(event.key))
+                    return
+            self._draw_frame(screen)
+            pygame.display.update()
+
+    def activate(self):
+        self.is_active = True
+
+    def deactivate(self):
+        self.is_active = False
+
+    def _draw_frame(self, screen):
+        rect = self._surface.get_rect()
+        rect.topleft = self.location
+
+        pygame.draw.rect(
+            surface=screen,
+            color=(0, 0, 0),
+            rect=rect,
+            width=2
+        )
+
 
 class ActiveFlag(Control):
     def __init__(self, location=(0, 0), size=(1, 1), color=(0, 0, 0)):
@@ -226,18 +260,10 @@ class SettingWindow(Window):
         if event.key != pygame.K_RETURN:
             return
 
-        while True:
-            for event in pygame.event.get():
-                if event.type != pygame.KEYDOWN:
-                    continue
-                if event.key == pygame.K_ESCAPE:
-                    return
-                # TODO: Добавить список возможных клавиш для назначения
-                else:
-                    self._controls[self._selected_item_index] \
-                        .key \
-                        .change_text(pygame.key.name(event.key))
-                    return
+        key_control = self._controls[self._selected_item_index].key
+        key_control.activate()
+        key_control.wait_for_user_input(self._screen)
+        key_control.deactivate()
 
     def show(self):
         blue_color = (0, 49, 83)
