@@ -152,14 +152,21 @@ class RowSetting(Control):
         self.key = key
         self._controls: list[Control] = [label, key, flag]
 
-    def activate(self, is_active):
-        self._is_active = is_active
-        for component in self._controls:
-            component.is_active = is_active
+    def activate(self):
+        self._activation_toggle(True)
+
+    def deactivate(self):
+        self._activation_toggle(False)
 
     def draw(self, screen):
         for component in self._controls:
             component.draw(screen)
+
+    def _activation_toggle(self, is_active):
+        self._is_active = is_active
+        for component in self._controls:
+            if isinstance(component, ActiveFlag):
+                component.is_active = is_active
 
 
 class SettingWindow(Window):
@@ -172,7 +179,7 @@ class SettingWindow(Window):
         font = pygame.font.SysFont('Consolas', 25)
 
         right_setting = RowSetting(Label(font, 'right'), Key(font, ">"), location=(50, 50))
-        right_setting.activate(True)
+        right_setting.activate()
         self._controls.append(right_setting)
 
         left_setting = RowSetting(Label(font, 'left'), Key(font, "<"), location=(50, 80))
@@ -209,9 +216,9 @@ class SettingWindow(Window):
                 return
             for i, setting in enumerate(self._controls):
                 if i == self._selected_item_index:
-                    setting.activate(True)
+                    setting.activate()
                 else:
-                    setting.activate(False)
+                    setting.deactivate()
 
     def _change_key_value(self, event):
         if event.type != pygame.KEYDOWN:
