@@ -7,6 +7,14 @@ pygame.init()
 pygame.key.set_repeat(500)
 
 
+class Settings:
+    def __init__(self):
+        self.right_key = ">"
+        self.left_key = "<"
+        self.up_key = "^"
+        self.down_key = "v"
+
+
 class Character:
     def __init__(self, control: settings.UserControlSettings):
         self.surface = pygame.Surface((100, 100))
@@ -71,14 +79,19 @@ class Window(ABC):
 
 
 class GameWindow(Window):
-    def __init__(self, caption, size, character):
+    def __init__(self, caption, size, character, settings):
         super().__init__(caption, size)
         self._character = character
+        self._settings = settings
 
     def _open_settings_window_if_needed(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                settings = SettingWindow(f'{self._caption} | Settings', self._size)
+                settings = SettingWindow(
+                    f'{self._caption} | Settings',
+                    self._size,
+                    self._settings
+                )
                 settings.show()
 
     def show(self):
@@ -204,25 +217,43 @@ class RowSetting(Control):
 
 
 class SettingWindow(Window):
-    def __init__(self, caption, size):
+    def __init__(self, caption, size, settings: Settings):
         super().__init__(caption, size)
         self._controls: list[RowSetting] = []
+        self._settings = settings
         self._initialize_components()
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
 
-        right_setting = RowSetting(Label(font, 'right'), Key(font, ">"), location=(50, 50))
+        right_setting = RowSetting(
+            Label(font, 'right'),
+            Key(font, self._settings.right_key),
+            location=(50, 50)
+        )
         right_setting.activate()
+
+        left_setting = RowSetting(
+            Label(font, 'left'),
+            Key(font, self._settings.left_key),
+            location=(50, 80)
+        )
+
+        up_setting = RowSetting(
+            Label(font, 'up'),
+            Key(font, self._settings.up_key),
+            location=(50, 110)
+        )
+
+        down_setting = RowSetting(
+            Label(font, 'down'),
+            Key(font, self._settings.down_key),
+            location=(50, 140)
+        )
+
         self._controls.append(right_setting)
-
-        left_setting = RowSetting(Label(font, 'left'), Key(font, "<"), location=(50, 80))
         self._controls.append(left_setting)
-
-        up_setting = RowSetting(Label(font, 'up'), Key(font, "^"), location=(50, 110))
         self._controls.append(up_setting)
-
-        down_setting = RowSetting(Label(font, 'down'), Key(font, "v"), location=(50, 140))
         self._controls.append(down_setting)
 
         self._selected_item_index = 0
@@ -279,11 +310,13 @@ class SettingWindow(Window):
 
 
 if __name__ == '__main__':
+    ui_settings = Settings()
     # window = GameWindow(
     #     caption='Controls tests',
     #     size=(1000, 500),
-    #     character=Character(settings.UserControlSettings())
+    #     character=Character(settings.UserControlSettings()),
+    #     settings=ui_settings
     # )
     # window.show()
-    sw = SettingWindow("settings", (1000, 500))
+    sw = SettingWindow("settings", (1000, 500), ui_settings)
     sw.show()
