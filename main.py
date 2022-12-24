@@ -1,6 +1,8 @@
+import json
 import pygame
 import settings
 
+from types import SimpleNamespace
 from abc import ABC, abstractmethod
 
 pygame.init()
@@ -8,11 +10,11 @@ pygame.key.set_repeat(500)
 
 
 class Settings:
-    def __init__(self):
-        self.right_key = ">"
-        self.left_key = "<"
-        self.up_key = "^"
-        self.down_key = "v"
+    def __init__(self, right_key, left_key, up_key, down_key):
+        self.right_key = right_key
+        self.left_key = left_key
+        self.up_key = up_key
+        self.down_key = down_key
 
 
 class Character:
@@ -310,13 +312,22 @@ class SettingWindow(Window):
 
 
 if __name__ == '__main__':
-    ui_settings = Settings()
-    # window = GameWindow(
-    #     caption='Controls tests',
-    #     size=(1000, 500),
-    #     character=Character(settings.UserControlSettings()),
-    #     settings=ui_settings
-    # )
-    # window.show()
-    sw = SettingWindow("settings", (1000, 500), ui_settings)
-    sw.show()
+    ui_settings = None
+    with open('settings.json', 'r') as file:
+        ui_settings = json.loads(
+            ''.join(file.readlines()),
+            object_hook=lambda d: SimpleNamespace(**d)
+        )
+
+    if ui_settings is not None:
+        # window = GameWindow(
+        #     caption='Controls tests',
+        #     size=(1000, 500),
+        #     character=Character(settings.UserControlSettings()),
+        #     settings=ui_settings
+        # )
+        # window.show()
+        sw = SettingWindow("settings", (1000, 500), ui_settings)
+        sw.show()
+    else:
+        print("не получилось десериализовать свойства")
