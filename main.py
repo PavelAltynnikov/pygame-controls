@@ -112,7 +112,7 @@ class Label(Control):
         self._font = font
         self._antialias = antialias
         self._color = color
-        self._surface = font.render(text, antialias, color)
+        self._surface: pygame.Surface = font.render(text, antialias, color)
         self.location = location
 
     def draw(self, screen):
@@ -124,7 +124,7 @@ class Key(Label):
         super().__init__(font, text, antialias, color, location)
 
     def change_text(self, value):
-        self._surface = self._font.render(value, self._antialias, self._color)
+        self._surface: pygame.Surface = self._font.render(value, self._antialias, self._color)
 
 
 class ActiveFlag(Control):
