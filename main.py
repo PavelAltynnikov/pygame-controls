@@ -1,8 +1,10 @@
 import json
+import types
+
 import pygame
+
 import view
 
-from types import SimpleNamespace
 
 pygame.init()
 pygame.key.set_repeat(500)
@@ -10,7 +12,7 @@ pygame.key.set_repeat(500)
 with open('settings.json', 'r') as file:
     ui_settings = json.loads(
         ''.join(file.readlines()),
-        object_hook=lambda d: SimpleNamespace(**d)
+        object_hook=lambda d: types.SimpleNamespace(**d)
     )
 
 # window = GameWindow(
