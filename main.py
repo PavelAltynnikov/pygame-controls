@@ -8,10 +8,10 @@ pygame.init()
 pygame.key.set_repeat(500)
 
 ui_settings = settings.get_ui_settings()
-# window = GameWindow(
+# window = view.GameWindow(
 #     caption='Controls tests',
 #     size=(1000, 500),
-#     character=Character(settings.UserControlSettings()),
+#     character=view.Character(settings.UserControlSettings()),
 #     settings=ui_settings
 # )
 # window.show()
