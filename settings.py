@@ -1,4 +1,14 @@
+import json
+
 import pygame
+
+
+def get_ui_settings():
+    with open('settings.json', 'r') as file:
+        return json.loads(
+            ''.join(file.readlines()),
+            object_hook=lambda d: Settings(**d)
+        )
 
 
 class UserControlSettings:

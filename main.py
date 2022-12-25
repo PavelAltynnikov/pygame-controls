@@ -1,20 +1,13 @@
-import json
-import types
-
 import pygame
 
+import settings
 import view
 
 
 pygame.init()
 pygame.key.set_repeat(500)
 
-with open('settings.json', 'r') as file:
-    ui_settings = json.loads(
-        ''.join(file.readlines()),
-        object_hook=lambda d: types.SimpleNamespace(**d)
-    )
-
+ui_settings = settings.get_ui_settings()
 # window = GameWindow(
 #     caption='Controls tests',
 #     size=(1000, 500),
