@@ -1,8 +1,9 @@
 from abc import ABC
+import os
 import json
 
 
-SETTINGS_FILE_PATH = 'setting.json'
+SETTINGS_FILE_PATH = os.path.join(os.path.dirname(__file__), 'settings.json')
 
 
 class Setting:
