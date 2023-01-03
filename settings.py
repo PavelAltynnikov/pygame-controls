@@ -2,6 +2,9 @@ from abc import ABC
 import json
 
 
+SETTINGS_FILE_PATH = 'setting.json'
+
+
 class Setting:
     def __init__(self, value: int):
         self.value = value
@@ -18,7 +21,7 @@ class ControlSettings(ABC):
         self.down = down
 
     def save(self):
-        with open('settings.json', 'w') as file:
+        with open(SETTINGS_FILE_PATH, 'w') as file:
             file.write(json.dumps(self.__dict__, default=lambda o: o.__dict__))
 
 
@@ -28,6 +31,6 @@ class PygameKeyboardControlSettings(ControlSettings):
 
 
 def get_ui_settings(settings_type: type[ControlSettings]) -> ControlSettings:
-    with open('settings.json', 'r') as file:
+    with open(SETTINGS_FILE_PATH, 'r') as file:
         data = json.loads(''.join(file.readlines()))
         return settings_type(**{k: Setting(v["value"]) for k, v in data.items()})
