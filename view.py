@@ -2,39 +2,22 @@ from abc import ABC, abstractmethod
 
 import pygame
 
+import controller
+import model
 import settings
 
 
-class Character:
-    def __init__(self, control: settings.UserControlSettings):
+class Sprite:
+    def __init__(self, model: model.Character):
         self.surface = pygame.Surface((100, 100))
         self.surface.fill((250, 50, 50))
         self.rect = self.surface.get_rect()
         self.rect.center = (300, 300)
-        self._control = control
+        self._character = model
 
-    def move(self):
-        keys = pygame.key.get_pressed()
-        if keys[self._control.move_right] and keys[self._control.move_up]:
-            self.rect.x += 1
-            self.rect.y -= 1
-        elif keys[self._control.move_right] and keys[self._control.move_down]:
-            self.rect.x += 1
-            self.rect.y += 1
-        elif keys[self._control.move_left] and keys[self._control.move_up]:
-            self.rect.x -= 1
-            self.rect.y -= 1
-        elif keys[self._control.move_left] and keys[self._control.move_down]:
-            self.rect.x -= 1
-            self.rect.y += 1
-        elif keys[self._control.move_right]:
-            self.rect.x += 1
-        elif keys[self._control.move_left]:
-            self.rect.x -= 1
-        elif keys[self._control.move_up]:
-            self.rect.y -= 1
-        elif keys[self._control.move_down]:
-            self.rect.y += 1
+    def update(self):
+        self.rect.x = self._character.location.x
+        self.rect.y = self._character.location.y
 
     def draw(self, screen):
         screen.blit(self.surface, self.rect)
@@ -68,37 +51,6 @@ class Window(ABC):
         self._is_showing = False
 
 
-class GameWindow(Window):
-    def __init__(self, caption, size, character, settings):
-        super().__init__(caption, size)
-        self._character = character
-        self._settings = settings
-
-    def _open_settings_window_if_needed(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                settings = SettingWindow(
-                    f'{self._caption} | Settings',
-                    self._size,
-                    self._settings
-                )
-                settings.show()
-
-    def show(self):
-        green_color = (30, 89, 89)
-        while self._is_showing:
-            events = pygame.event.get()
-            self._quit_if_user_wants_to_close_window(events)
-            self._open_settings_window_if_needed(events)
-
-            self._character.move()
-
-            self._screen.fill(green_color)
-            self._character.draw(self._screen)
-
-            pygame.display.update()
-
-
 class Control(ABC):
     def __init__(self, location=(0, 0)):
         self.location = location
@@ -115,36 +67,41 @@ class Label(Control):
         self._font = font
         self._antialias = antialias
         self._color = color
-        self._surface: pygame.Surface = font.render(text, antialias, color)
+        self._surface = None
         self.location = location
+        self.update_surface_from_text(text)
+
+    def update_surface_from_text(self, text) -> None:
+        self._surface = self._font.render(text, self._antialias, self._color)
 
     def draw(self, screen):
         screen.blit(self._surface, self.location)
 
 
 class Key(Label):
-    def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
-        super().__init__(font, text, antialias, color, location)
+    def __init__(
+            self,
+            font,
+            setting: settings.Setting,
+            control: controller.Control,
+            antialias=False,
+            color=(0, 0, 0),
+            location=(0, 0)):
+        key_value = pygame.key.name(setting.value)
+        super().__init__(
+            font,
+            key_value,
+            antialias,
+            color,
+            location
+        )
+        self._setting = setting
+        self._control = control
 
     def change_text(self, value):
-        self._surface: pygame.Surface = self._font.render(value, self._antialias, self._color)
-
-    def wait_for_user_input(self, screen):
-        # TODO: тут дохера логики,
-        # и ивенты, и черчение рамки и апдейт экрана.
-        # Надо подумать как это сделать лаконичней.
-        while True:
-            for event in pygame.event.get():
-                if event.type != pygame.KEYDOWN:
-                    continue
-                if event.key == pygame.K_ESCAPE:
-                    return
-                # TODO: Добавить список возможных клавиш для назначения
-                else:
-                    self.change_text(pygame.key.name(event.key))
-                    return
-            self._draw_frame(screen)
-            pygame.display.update()
+        self._surface: pygame.Surface = self._font.render(
+            value, self._antialias, self._color
+        )
 
     def activate(self):
         self.is_active = True
@@ -152,7 +109,7 @@ class Key(Label):
     def deactivate(self):
         self.is_active = False
 
-    def _draw_frame(self, screen):
+    def draw_frame(self, screen):
         rect = self._surface.get_rect()
         rect.topleft = self.location
 
@@ -207,37 +164,58 @@ class RowSetting(Control):
 
 
 class SettingWindow(Window):
-    def __init__(self, caption, size, settings: settings.Settings):
+    def __init__(
+            self,
+            caption,
+            size,
+            settings: settings.ControlSettings,
+            controller: controller.Controller):
         super().__init__(caption, size)
         self._controls: list[RowSetting] = []
         self._settings = settings
+        self._controller = controller
         self._initialize_components()
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
-
         right_setting = RowSetting(
             Label(font, 'right'),
-            Key(font, self._settings.right_key),
+            Key(
+                font=font,
+                setting=self._settings.right,
+                control=self._controller.move_right
+            ),
             location=(50, 50)
         )
         right_setting.activate()
 
         left_setting = RowSetting(
             Label(font, 'left'),
-            Key(font, self._settings.left_key),
+            Key(
+                font=font,
+                setting=self._settings.left,
+                control=self._controller.move_left
+            ),
             location=(50, 80)
         )
 
         up_setting = RowSetting(
             Label(font, 'up'),
-            Key(font, self._settings.up_key),
+            Key(
+                font=font,
+                setting=self._settings.up,
+                control=self._controller.move_up
+            ),
             location=(50, 110)
         )
 
         down_setting = RowSetting(
             Label(font, 'down'),
-            Key(font, self._settings.down_key),
+            Key(
+                font=font,
+                setting=self._settings.down,
+                control=self._controller.move_down
+            ),
             location=(50, 140)
         )
 
@@ -283,8 +261,34 @@ class SettingWindow(Window):
 
         key_control = self._controls[self._selected_item_index].key
         key_control.activate()
-        key_control.wait_for_user_input(self._screen)
+
+        key_number = self._waiting_for_user_assign_new_key(self._screen, key_control)
+        if key_number is None:
+            return
+
+        key_control.change_text(pygame.key.name(key_number))
+        key_control._control.key_number = key_number
+
+        key_control._setting.value = key_number
+        self._settings.save()
+
         key_control.deactivate()
+
+    def _waiting_for_user_assign_new_key(self, screen, key_control: Key) -> int | None:
+        # TODO: тут дохера логики,
+        # и ивенты, и черчение рамки и апдейт экрана.
+        # Надо подумать как это сделать лаконичней.
+        while True:
+            for event in pygame.event.get():
+                if event.type != pygame.KEYDOWN:
+                    continue
+                if event.key == pygame.K_ESCAPE:
+                    return
+                # TODO: Добавить список возможных клавиш для назначения
+                else:
+                    return event.key
+            key_control.draw_frame(screen)
+            pygame.display.update()
 
     def show(self):
         blue_color = (0, 49, 83)
@@ -295,5 +299,52 @@ class SettingWindow(Window):
 
             self._screen.fill(blue_color)
             self._draw()
+
+            pygame.display.update()
+        self._is_showing = True
+
+
+class GameWindow(Window):
+    def __init__(
+            self,
+            caption: str,
+            size: tuple[int, int],
+            sprite: Sprite,
+            mover: controller.Mover,
+            settings_window: SettingWindow):
+        super().__init__(caption, size)
+        self._sprite = sprite
+        self._mover = mover
+        self._settings_window = settings_window
+
+    def _open_settings_window_if_needed(self, events):
+        for event in events:
+            if event.type != pygame.KEYDOWN:
+                continue
+            if event.key == pygame.K_s:
+                self._settings_window.show()
+
+    def _move_all_objects(self):
+        # вот это полная хуйня
+        self._mover.move_character(character=self._sprite._character)
+
+    def _update_all_objects(self):
+        self._sprite.update()
+
+    def _draw_all(self, background_color):
+        self._screen.fill(background_color)
+        self._sprite.draw(self._screen)
+
+    def show(self):
+        green = (30, 89, 89)
+        while self._is_showing:
+            events = pygame.event.get()
+
+            self._quit_if_user_wants_to_close_window(events)
+            self._open_settings_window_if_needed(events)
+
+            self._move_all_objects()
+            self._update_all_objects()
+            self._draw_all(background_color=green)
 
             pygame.display.update()
