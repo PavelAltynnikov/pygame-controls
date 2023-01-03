@@ -1,19 +1,36 @@
 import pygame
 
+import controller
+import model
 import settings
 import view
 
 
+SCREEN_SIZE = (1000, 500)
+
 pygame.init()
 pygame.key.set_repeat(500)
+screen = pygame.display.set_mode(SCREEN_SIZE)
 
-ui_settings = settings.get_ui_settings()
-# window = view.GameWindow(
-#     caption='Controls tests',
-#     size=(1000, 500),
-#     character=view.Character(settings.UserControlSettings()),
-#     settings=ui_settings
-# )
-# window.show()
-sw = view.SettingWindow("settings", (1000, 500), ui_settings)
-sw.show()
+character = model.Character(model.Point(300, 300))
+
+control_settings = settings.get_ui_settings(settings.PygameKeyboardControlSettings)
+current_controller = controller.PygameKeyboardController(control_settings)
+mover = controller.Mover(current_controller)
+
+settings_window = view.SettingWindow(
+    caption="settings",
+    size=SCREEN_SIZE,
+    settings=control_settings,
+    controller=current_controller
+)
+
+window = view.GameWindow(
+    caption='Controls tests',
+    size=SCREEN_SIZE,
+    sprite=view.Sprite(character),
+    mover=mover,
+    settings_window=settings_window
+)
+
+window.show()
