@@ -1,6 +1,1 @@
-{
-    "right_key": ">",
-    "left_key": "<",
-    "up_key": "^",
-    "down_key": "v"
-}
+{"right": {"value": 1073741903}, "left": {"value": 1073741904}, "up": {"value": 1073741906}, "down": {"value": 1073741905}}
