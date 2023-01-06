@@ -18,17 +18,17 @@ control_settings = settings.get_ui_settings(settings.PygameKeyboardControlSettin
 current_controller = controller.PygameKeyboardController(control_settings)
 mover = controller.Mover(current_controller)
 
-settings_window = view.SettingWindow(
+settings_window = view.windows.SettingWindow(
     caption="settings",
     size=SCREEN_SIZE,
     settings=control_settings,
     controller=current_controller
 )
 
-window = view.GameWindow(
+window = view.windows.GameWindow(
     caption='Controls tests',
     size=SCREEN_SIZE,
-    sprite=view.Sprite(character),
+    sprite=view.sprites.Sprite(character),
     mover=mover,
     settings_window=settings_window
 )
