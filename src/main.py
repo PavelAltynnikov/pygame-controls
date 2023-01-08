@@ -25,12 +25,18 @@ settings_window = view.windows.SettingWindow(
     controller=current_controller
 )
 
+menu_window = view.windows.MenuWindow(
+    caption='Controls tests | Menu',
+    size=SCREEN_SIZE,
+    settings_window=settings_window
+)
+
 window = view.windows.GameWindow(
     caption='Controls tests',
     size=SCREEN_SIZE,
     sprite=view.sprites.Sprite(character),
     mover=mover,
-    settings_window=settings_window
+    menu_window=menu_window
 )
 
 window.show()
