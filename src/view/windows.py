@@ -6,14 +6,16 @@ import controller
 import settings
 from . import sprites
 from . import controls
+# TODO Нужно отказаться от зависимости одного окна от другого окна.
 
 
 class Window(ABC):
-    def __init__(self, caption, size):
+    def __init__(self, caption: str, size: tuple[int, int]):
         self._caption = caption
         self._size = size
         self._screen = pygame.display.set_mode(size)
         self._is_showing = True
+        self._controls: list[controls.Control] = []
         pygame.display.set_caption(caption)
 
     @staticmethod
@@ -44,7 +46,6 @@ class SettingWindow(Window):
             settings: settings.ControlSettings,
             controller: controller.Controller):
         super().__init__(caption, size)
-        self._controls: list[controls.RowSetting] = []
         self._settings = settings
         self._controller = controller
         self._initialize_components()
@@ -121,6 +122,8 @@ class SettingWindow(Window):
             else:
                 return
             for i, setting in enumerate(self._controls):
+                if not isinstance(setting, controls.RowSetting):
+                    continue
                 if i == self._selected_item_index:
                     setting.activate()
                 else:
@@ -131,8 +134,11 @@ class SettingWindow(Window):
             return
         if event.key != pygame.K_RETURN:
             return
+        control = self._controls[self._selected_item_index]
+        if not isinstance(control, controls.RowSetting):
+            return
 
-        key_control = self._controls[self._selected_item_index].key
+        key_control = control.key
         key_control.activate()
 
         key_number = self._waiting_for_user_assign_new_key(self._screen, key_control)
@@ -199,7 +205,7 @@ class GameWindow(Window):
                 self._settings_window.show()
 
     def _move_all_objects(self):
-        # вот это полная хуйня
+        # вот это полная хуйня из-за _sprite._character
         self._mover.move_character(character=self._sprite._character)
 
     def _update_all_objects(self):
