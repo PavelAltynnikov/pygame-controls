@@ -84,6 +84,41 @@ class Key(Label):
         )
 
 
+class Button(Label):
+    def __init__(self, font, text, antialias, color, location):
+        super().__init__(font, text, antialias, color, location)
+        self._handlers = []
+
+    def add_click_handler(self, handler: Callable) -> None:
+        self._handlers.append(handler)
+
+    def click(self) -> None:
+        for handler in self._handlers:
+            handler()
+
+    def activate(self):
+        self.is_active = True
+
+    def deactivate(self):
+        self.is_active = False
+
+    def draw_frame(self, screen):
+        rect = self._surface.get_rect()
+        rect.topleft = self.location
+
+        pygame.draw.rect(
+            surface=screen,
+            color=(0, 0, 0),
+            rect=rect,
+            width=2
+        )
+
+    def draw(self, screen):
+        super().draw(screen)
+        if self.is_active:
+            self.draw_frame(screen)
+
+
 class ActiveFlag(Control):
     def __init__(self, location=(0, 0), size=(1, 1), color=(0, 0, 0)):
         super().__init__(location)
