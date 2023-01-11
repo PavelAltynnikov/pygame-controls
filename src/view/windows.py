@@ -184,36 +184,90 @@ class SettingWindow(Window):
         self._is_showing = True
 
 
+class GameWindow(Window):
+    def __init__(
+            self,
+            caption: str,
+            size: tuple[int, int],
+            sprite: sprites.Sprite,
+            mover: controller.Mover):
+        super().__init__(caption, size)
+        self._sprite = sprite
+        self._mover = mover
+
+    def _quit(self):
+        self._is_showing = False
+
+    def _move_all_objects(self):
+        # вот это полная хуйня из-за _sprite._character
+        self._mover.move_character(character=self._sprite._character)
+
+    def _update_all_objects(self):
+        self._sprite.update()
+
+    def _draw_all(self, background_color):
+        self._screen.fill(background_color)
+        self._sprite.draw(self._screen)
+
+    def show(self):
+        green = (30, 89, 89)
+        while self._is_showing:
+            events = pygame.event.get()
+            self._quit_if_user_wants_to_close_window(events)
+
+            self._move_all_objects()
+            self._update_all_objects()
+            self._draw_all(background_color=green)
+
+            pygame.display.update()
+
+        self._is_showing = True
+
+
 class MenuWindow(Window):
-    def __init__(self, caption, size, settings_window: SettingWindow):
+    def __init__(
+            self, caption, size,
+            game_window: GameWindow, settings_window: SettingWindow):
         super().__init__(caption, size)
         self._settings_window = settings_window
+        self._game_window = game_window
         self._initialize_components()
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
-        self.button_quit = controls.Button(
+
+        self.button_play = controls.Button(
             font=font,
-            text="quit",
+            text="play",
             antialias=False,
             color=(0, 0, 0),
             location=(100, 100),
         )
-        self.button_quit.add_click_handler(self._quit)
-        self.button_quit.activate()
+        self.button_play.add_click_handler(self._game_window.show)
+        self.button_play.activate()
 
         self.button_settings = controls.Button(
             font=font,
             text="settings",
             antialias=False,
             color=(0, 0, 0),
-            location=(100, 300),
+            location=(100, 200),
         )
         self.button_settings.add_click_handler(self._settings_window.show)
 
+        self.button_quit = controls.Button(
+            font=font,
+            text="quit",
+            antialias=False,
+            color=(0, 0, 0),
+            location=(100, 300),
+        )
+        self.button_quit.add_click_handler(self._quit)
+
         self._selected_item_index = 0
-        self._controls.append(self.button_quit)
+        self._controls.append(self.button_play)
         self._controls.append(self.button_settings)
+        self._controls.append(self.button_quit)
 
     def _quit(self):
         self._is_showing = False
@@ -270,55 +324,4 @@ class MenuWindow(Window):
             self._draw()
 
             pygame.display.update()
-        self._is_showing = True
-
-
-class GameWindow(Window):
-    def __init__(
-            self,
-            caption: str,
-            size: tuple[int, int],
-            sprite: sprites.Sprite,
-            mover: controller.Mover,
-            menu_window: MenuWindow):
-        super().__init__(caption, size)
-        self._sprite = sprite
-        self._mover = mover
-        self._menu_window = menu_window
-        self._menu_window.button_quit.add_click_handler(self._quit)
-
-    def _open_menu_window_if_needed(self, events):
-        for event in events:
-            if event.type != pygame.KEYDOWN:
-                continue
-            if event.key == pygame.K_ESCAPE:
-                self._menu_window.show()
-
-    def _quit(self):
-        self._is_showing = False
-
-    def _move_all_objects(self):
-        # вот это полная хуйня из-за _sprite._character
-        self._mover.move_character(character=self._sprite._character)
-
-    def _update_all_objects(self):
-        self._sprite.update()
-
-    def _draw_all(self, background_color):
-        self._screen.fill(background_color)
-        self._sprite.draw(self._screen)
-
-    def show(self):
-        green = (30, 89, 89)
-        while self._is_showing:
-            events = pygame.event.get()
-
-            self._open_menu_window_if_needed(events)
-
-            self._move_all_objects()
-            self._update_all_objects()
-            self._draw_all(background_color=green)
-
-            pygame.display.update()
-
         self._is_showing = True
