@@ -34,9 +34,9 @@ game_window = view.windows.GameWindow(
 
 start_window = view.windows.MenuWindow(
     caption='Controls tests | Menu',
-    size=SCREEN_SIZE,
-    game_window=game_window,
-    settings_window=settings_window
+    size=SCREEN_SIZE
 )
+start_window.play_button_handlers.append(game_window.show)
+start_window.settings_button_handlers.append(settings_window.show)
 
 start_window.show()

@@ -6,7 +6,6 @@ import controller
 import settings
 from . import sprites
 from . import controls
-# TODO Нужно отказаться от зависимости одного окна от другого окна.
 
 
 class Window(ABC):
@@ -225,12 +224,10 @@ class GameWindow(Window):
 
 
 class MenuWindow(Window):
-    def __init__(
-            self, caption, size,
-            game_window: GameWindow, settings_window: SettingWindow):
+    def __init__(self, caption, size):
         super().__init__(caption, size)
-        self._settings_window = settings_window
-        self._game_window = game_window
+        self.play_button_handlers = []
+        self.settings_button_handlers = []
         self._initialize_components()
 
     def _initialize_components(self):
@@ -314,6 +311,17 @@ class MenuWindow(Window):
     def _draw(self):
         for control in self._controls:
             control.draw(self._screen)
+
+    def _on_play_button_click(self):
+        for handler in self.play_button_handlers:
+            handler()
+
+    def _on_settings_button_click(self):
+        for handler in self.settings_button_handlers:
+            handler()
+
+    def _on_quit_button_click_handler(self):
+        self._quit()
 
     def show(self):
         gray_color = (156, 156, 156)
