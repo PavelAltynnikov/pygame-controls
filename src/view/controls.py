@@ -1,15 +1,17 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 import pygame
 
+# Эти зависимости мешают тестировать модуль
 import settings
 import controller
 
 
 class Control(ABC):
-    def __init__(self, location=(0, 0)):
+    def __init__(self, location: tuple[int, int] = (0, 0)):
         self.location = location
-        self.is_active = False
+        self.is_active = False  # переименовать в is_focused
 
     @abstractmethod
     def draw(self, screen):
@@ -17,7 +19,13 @@ class Control(ABC):
 
 
 class Label(Control):
-    def __init__(self, font, text, antialias=False, color=(0, 0, 0), location=(0, 0)):
+    def __init__(
+            self,
+            font: pygame.font.Font,
+            text: str,
+            antialias=False,
+            color: tuple[int, int, int] = (0, 0, 0),
+            location=(0, 0)):
         super().__init__(location)
         self._font = font
         self._antialias = antialias
@@ -54,7 +62,7 @@ class Key(Label):
         self._control = control
 
     def change_text(self, value):
-        self._surface: pygame.Surface = self._font.render(
+        self._surface: pygame.surface.Surface = self._font.render(
             value, self._antialias, self._color
         )
 
@@ -74,6 +82,41 @@ class Key(Label):
             rect=rect,
             width=2
         )
+
+
+class Button(Label):
+    def __init__(self, font, text, antialias, color, location):
+        super().__init__(font, text, antialias, color, location)
+        self._handlers = []
+
+    def add_click_handler(self, handler: Callable) -> None:
+        self._handlers.append(handler)
+
+    def click(self) -> None:
+        for handler in self._handlers:
+            handler()
+
+    def activate(self):
+        self.is_active = True
+
+    def deactivate(self):
+        self.is_active = False
+
+    def draw_frame(self, screen):
+        rect = self._surface.get_rect()
+        rect.topleft = self.location
+
+        pygame.draw.rect(
+            surface=screen,
+            color=(0, 0, 0),
+            rect=rect,
+            width=2
+        )
+
+    def draw(self, screen):
+        super().draw(screen)
+        if self.is_active:
+            self.draw_frame(screen)
 
 
 class ActiveFlag(Control):
