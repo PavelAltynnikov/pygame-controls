@@ -15,14 +15,14 @@ screen = pygame.display.set_mode(SCREEN_SIZE)
 character = model.Character(model.Point(300, 300))
 
 control_settings = settings.get_ui_settings(settings.PygameKeyboardControlSettings)
-current_controller = controller.PygameKeyboardController(control_settings)
-mover = controller.Mover(current_controller)
+keyboard = controller.PygameKeyboardController(control_settings)
+mover = controller.Mover(keyboard)
 
 settings_window = view.windows.SettingWindow(
     caption="settings",
     size=SCREEN_SIZE,
     settings=control_settings,
-    controller=current_controller
+    controller=keyboard
 )
 
 game_window = view.windows.GameWindow(
@@ -32,11 +32,11 @@ game_window = view.windows.GameWindow(
     mover=mover,
 )
 
-menu_window = view.windows.MenuWindow(
+start_window = view.windows.MenuWindow(
     caption='Controls tests | Menu',
     size=SCREEN_SIZE,
     game_window=game_window,
     settings_window=settings_window
 )
 
-menu_window.show()
+start_window.show()
