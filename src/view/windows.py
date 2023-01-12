@@ -236,45 +236,47 @@ class MenuWindow(Window):
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
 
-        self.button_play = controls.Button(
+        button_play = controls.Button(
             font=font,
             text="play",
             antialias=False,
             color=(0, 0, 0),
             location=(100, 100),
         )
-        self.button_play.add_click_handler(self._game_window.show)
-        self.button_play.activate()
+        button_play.add_click_handler(self._on_play_button_click)
+        button_play.activate()
 
-        self.button_settings = controls.Button(
+        button_settings = controls.Button(
             font=font,
             text="settings",
             antialias=False,
             color=(0, 0, 0),
             location=(100, 200),
         )
-        self.button_settings.add_click_handler(self._settings_window.show)
+        button_settings.add_click_handler(self._on_settings_button_click)
 
-        self.button_quit = controls.Button(
+        button_quit = controls.Button(
             font=font,
             text="quit",
             antialias=False,
             color=(0, 0, 0),
             location=(100, 300),
         )
-        self.button_quit.add_click_handler(self._quit)
+        button_quit.add_click_handler(self._on_quit_button_click_handler)
 
         self._selected_item_index = 0
-        self._controls.append(self.button_play)
-        self._controls.append(self.button_settings)
-        self._controls.append(self.button_quit)
+        self._controls.append(button_play)
+        self._controls.append(button_settings)
+        self._controls.append(button_quit)
 
     def _quit(self):
         self._is_showing = False
 
-    def _event_handler(self, events):
-        for event in events:
-            self._change_active_button(event)
+    def _events_handler(self):
+        events = pygame.event.get()
+        self._quit_if_user_wants_to_close_window(events)
+        self._change_active_button(events)
+        self._click_on_button(events)
 
     def _click_on_button(self, events):
         for event in events:
@@ -288,25 +290,26 @@ class MenuWindow(Window):
 
             control.click()
 
-    def _change_active_button(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
-                self._selected_item_index += 1
-                if self._selected_item_index >= len(self._controls):
-                    self._selected_item_index = 0
-            elif event.key == pygame.K_UP:
-                self._selected_item_index -= 1
-                if self._selected_item_index < 0:
-                    self._selected_item_index = len(self._controls) - 1
-            else:
-                return
-            for i, button in enumerate(self._controls):
-                if not isinstance(button, controls.Button):
-                    continue
-                if i == self._selected_item_index:
-                    button.activate()
+    def _change_active_button(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    self._selected_item_index += 1
+                    if self._selected_item_index >= len(self._controls):
+                        self._selected_item_index = 0
+                elif event.key == pygame.K_UP:
+                    self._selected_item_index -= 1
+                    if self._selected_item_index < 0:
+                        self._selected_item_index = len(self._controls) - 1
                 else:
-                    button.deactivate()
+                    return
+                for i, button in enumerate(self._controls):
+                    if not isinstance(button, controls.Button):
+                        continue
+                    if i == self._selected_item_index:
+                        button.activate()
+                    else:
+                        button.deactivate()
 
     def _draw(self):
         for control in self._controls:
@@ -315,10 +318,7 @@ class MenuWindow(Window):
     def show(self):
         gray_color = (156, 156, 156)
         while self._is_showing:
-            events = pygame.event.get()
-            self._quit_if_user_wants_to_close_window(events)
-            self._event_handler(events)
-            self._click_on_button(events)
+            self._events_handler()
 
             self._screen.fill(gray_color)
             self._draw()
