@@ -1,3 +1,11 @@
+Данный проект создан для тренировки навыков применения паттернов и архитектур.
+
+# Структура
+## Пакеты
+![Пакеты](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/packages.png)
+## Классы
+![Классы](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/classes.png)
+
 # Окружение
 ```
 Интерпретатор:  Python 3.10  
