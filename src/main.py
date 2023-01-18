@@ -15,7 +15,8 @@ screen = pygame.display.set_mode(SCREEN_SIZE)
 character = model.Character(model.Point(300, 300))
 
 controller_settings = settings.get_ui_settings(settings.PygameKeyboardControlSettings)
-controller_ = controller.PygameKeyboardController(controller_settings)
+# controller_ = controller.PygameKeyboardController(controller_settings)
+controller_ = controller.PygameGamepadController()
 mover = controller.Mover(controller_)
 
 settings_window = view.windows.SettingWindow(
