@@ -8,58 +8,45 @@ import settings
 
 
 class Control:
-    def __init__(self, key_number):
-        self.key_number = key_number
-
-
-class Controller(ABC):
-    @property
-    @abstractmethod
-    def move_right(self) -> Control:
-        ...
-
-    @move_right.setter
-    @abstractmethod
-    def move_right(self, value: Control):
-        ...
+    """Представляет один элемент управления на каком либо устройстве ввода.
+    Это может быть клавиатура, геймпад, дойстик и т.д.
+    """
+    def __init__(self, key_number: int):
+        self._key_number = key_number
+        self._activated = False
+        self._value = 0
 
     @property
-    @abstractmethod
-    def move_left(self) -> Control:
-        pass
-
-    @move_left.setter
-    @abstractmethod
-    def move_left(self, value: Control):
-        ...
+    def key_number(self) -> int:
+        return self._key_number
 
     @property
-    @abstractmethod
-    def move_up(self) -> Control:
-        ...
-
-    @move_up.setter
-    @abstractmethod
-    def move_up(self, value: Control):
-        ...
+    def activated(self) -> bool:
+        return self._activated
 
     @property
-    @abstractmethod
-    def move_down(self) -> Control:
-        pass
+    def value(self) -> float:
+        return self._value
 
-    @move_down.setter
-    @abstractmethod
-    def move_down(self, value: Control):
-        ...
+    def update_key_number(self, key_number: int) -> None:
+        self._key_number = key_number
 
-    @abstractmethod
-    def get_new_x(self, keys: Sequence[bool], start_x: int, speed: int) -> int:
-        pass
+    def activate(self, value: float = 1):
+        """Должен вызываться при нажатии на реальный элемент управления контроллера.
 
-    @abstractmethod
-    def get_new_y(self, keys: Sequence[bool], start_y: int, speed: int) -> int:
-        pass
+        Args:
+            value: Величина с которой произошло нажатие.
+            Если не нужно учитывать величину нажатия, то по умолчанию значение 1.
+        """
+        self._activated = True
+        self._value = value
+
+    def deactivate(self):
+        """Должен вызываться при отжатии реального элемента управления контроллера.
+        """
+        self._activated = False
+        self._value = 0
+
 
 
 class PygameKeyboardController(Controller):
