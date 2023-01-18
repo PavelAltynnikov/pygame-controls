@@ -48,14 +48,13 @@ class Control:
         self._value = 0
 
 
-
-class PygameKeyboardController(Controller):
-    def __init__(self, settings: settings.ControlSettings):
-        self._settings = settings
-        self._move_right = Control(settings.right.value)
-        self._move_up = Control(settings.up.value)
-        self._move_left = Control(settings.left.value)
-        self._move_down = Control(settings.down.value)
+class Controller(ABC):
+    """Представляет физическое устройство ввода команд."""
+    def __init__(self):
+        self._move_up = Control(0)
+        self._move_right = Control(0)
+        self._move_down = Control(0)
+        self._move_left = Control(0)
 
     @property
     def move_right(self):
@@ -67,7 +66,7 @@ class PygameKeyboardController(Controller):
 
     @property
     def move_left(self):
-        return self._move_right
+        return self._move_left
 
     @move_left.setter
     def move_left(self, value: Control):
@@ -89,19 +88,18 @@ class PygameKeyboardController(Controller):
     def move_down(self, value: Control):
         self._move_down = value
 
-    def get_new_x(self, keys: Sequence[bool], start_x: int, speed: int) -> int:
-        if keys[self._move_right.key_number]:
-            return start_x + speed
-        if keys[self._move_left.key_number]:
-            return start_x - speed
-        return start_x
+    @abstractmethod
+    def conduct_survey_of_controls(self) -> None:
+        '''Метод который нужно вызывать при каждой итерации игрового цикла
+        чтобы понять какие котролы на контроллере были активированы.
+        '''
+        ...
 
-    def get_new_y(self, keys: Sequence[bool], start_y: int, speed: int) -> int:
-        if keys[self._move_up.key_number]:
-            return start_y - speed
-        if keys[self._move_down.key_number]:
-            return start_y + speed
-        return start_y
+    def deactivate_all_controls(self):
+        self._move_right.deactivate()
+        self._move_left.deactivate()
+        self._move_up.deactivate()
+        self._move_down.deactivate()
 
 
 class Mover:
