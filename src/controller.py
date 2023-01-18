@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Sequence
+from enum import Enum
 
 import pygame
 
@@ -128,3 +128,23 @@ class Mover:
         if self._controller.move_down.activated:
             return start_y + self._controller.move_down.value + speed
         return start_y
+
+
+class PygameKeyboardController(Controller):
+    def __init__(self, settings: settings.ControlSettings):
+        self._settings = settings
+        self._move_right = Control(settings.right.value)
+        self._move_up = Control(settings.up.value)
+        self._move_left = Control(settings.left.value)
+        self._move_down = Control(settings.down.value)
+
+    def conduct_survey_of_controls(self) -> None:
+        keys = pygame.key.get_pressed()
+        if keys[self._move_right.key_number]:
+            self._move_right.activate()
+        if keys[self._move_left.key_number]:
+            self._move_left.activate()
+        if keys[self._move_up.key_number]:
+            self._move_up.activate()
+        if keys[self._move_down.key_number]:
+            self._move_down.activate()
