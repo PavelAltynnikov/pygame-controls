@@ -145,7 +145,7 @@ class SettingWindow(Window):
             return
 
         key_control.change_text(pygame.key.name(key_number))
-        key_control._control.key_number = key_number
+        key_control._control.update_key_number(key_number)
 
         key_control._setting.value = key_number
         self._settings.save()
@@ -172,14 +172,18 @@ class SettingWindow(Window):
     def show(self):
         blue_color = (0, 49, 83)
         while self._is_showing:
+            self._controller.conduct_survey_of_controls()
+
             events = pygame.event.get()
             self._quit_if_user_wants_to_close_window(events)
             self._event_handler(events)
 
             self._screen.fill(blue_color)
             self._draw()
-
             pygame.display.update()
+
+            self._controller.deactivate_all_controls()
+
         self._is_showing = True
 
 
@@ -213,11 +217,13 @@ class GameWindow(Window):
         while self._is_showing:
             events = pygame.event.get()
             self._quit_if_user_wants_to_close_window(events)
+            self._mover._controller.conduct_survey_of_controls()
 
             self._move_all_objects()
             self._update_all_objects()
             self._draw_all(background_color=green)
 
+            self._mover._controller.deactivate_all_controls()
             pygame.display.update()
 
         self._is_showing = True
