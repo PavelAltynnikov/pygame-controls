@@ -105,28 +105,28 @@ class SettingWindow(Window):
 
     def _event_handler(self, events):
         for event in events:
-            self._change_active_setting(event)
+            self._change_active_setting()
             self._change_key_value(event)
 
-    def _change_active_setting(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
-                self._selected_item_index += 1
-                if self._selected_item_index >= len(self._controls):
-                    self._selected_item_index = 0
-            elif event.key == pygame.K_UP:
-                self._selected_item_index -= 1
-                if self._selected_item_index < 0:
-                    self._selected_item_index = len(self._controls) - 1
+    def _change_active_setting(self):
+        if self._controller.move_up.activated:
+            self._selected_item_index -= 1
+            if self._selected_item_index < 0:
+                self._selected_item_index = len(self._controls) - 1
+        elif self._controller.move_down.activated:
+            self._selected_item_index += 1
+            if self._selected_item_index >= len(self._controls):
+                self._selected_item_index = 0
+        else:
+            return
+
+        for i, setting in enumerate(self._controls):
+            if not isinstance(setting, controls.RowSetting):
+                continue
+            if i == self._selected_item_index:
+                setting.activate()
             else:
-                return
-            for i, setting in enumerate(self._controls):
-                if not isinstance(setting, controls.RowSetting):
-                    continue
-                if i == self._selected_item_index:
-                    setting.activate()
-                else:
-                    setting.deactivate()
+                setting.deactivate()
 
     def _change_key_value(self, event):
         if event.type != pygame.KEYDOWN:
