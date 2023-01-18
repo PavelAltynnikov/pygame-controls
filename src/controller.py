@@ -148,3 +148,53 @@ class PygameKeyboardController(Controller):
             self._move_up.activate()
         if keys[self._move_down.key_number]:
             self._move_down.activate()
+
+
+class GamePadAxe(Enum):
+    LEFT_STICK_X = 0
+    LEFT_STICK_Y = 1
+    RIGHT_STICK_X = 2
+    RIGHT_STICK_Y = 3
+    LEFT_TRIGGER = 4
+    RIGHT_TRIGGER = 5
+
+
+class GamePadButton(Enum):
+    A = 0
+    B = 1
+    X = 2
+    Y = 3
+    LB = 4
+    RB = 5
+    # элемента с номером 6 на моём геймпаде не оказалось
+    START = 7
+
+
+class PygameGamepadController(Controller):
+    def __init__(self):
+        # Конструктор должен принимать геймпад, потому что играть можно на нескольких
+        # геймпадах одновременно.
+        self._game_pad = [
+            pygame.joystick.Joystick(x)
+            for x
+            in range(pygame.joystick.get_count())
+        ][0]
+        self._dead_zone = 0.05
+        self._move_up = Control(GamePadAxe.LEFT_STICK_Y.value)
+        self._move_right = Control(GamePadAxe.LEFT_STICK_X.value)
+        self._move_down = Control(GamePadAxe.LEFT_STICK_Y.value)
+        self._move_left = Control(GamePadAxe.LEFT_STICK_X.value)
+
+    def conduct_survey_of_controls(self) -> None:
+        if value := self._game_pad.get_axis(GamePadAxe.LEFT_STICK_X.value):
+            if abs(value) > self._dead_zone:
+                if value > 0:
+                    self._move_right.activate(value)
+                else:
+                    self._move_left.activate(value)
+        if value := self._game_pad.get_axis(GamePadAxe.LEFT_STICK_Y.value):
+            if abs(value) > self._dead_zone:
+                if value < 0:
+                    self._move_up.activate(value)
+                else:
+                    self._move_down.activate(value)
