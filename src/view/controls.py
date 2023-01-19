@@ -103,7 +103,7 @@ class Button(Label):
         self.is_active = False
 
     def draw_frame(self, screen):
-        rect = self._surface.get_rect()
+        rect = self._surface.get_rect()  # type: ignore
         rect.topleft = self.location
 
         pygame.draw.rect(

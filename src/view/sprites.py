@@ -13,8 +13,8 @@ class Sprite:
         self._character = model
 
     def update(self):
-        self.rect.x = self._character.location.x
-        self.rect.y = self._character.location.y
+        self.rect.x = self._character.location.x  # type: ignore
+        self.rect.y = self._character.location.y  # type: ignore
 
     def draw(self, screen):
         screen.blit(self.surface, self.rect)
