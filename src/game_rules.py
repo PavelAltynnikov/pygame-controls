@@ -1,5 +1,5 @@
 import model
-from controller import Controller
+from controllers import Controller
 
 
 class Mover:

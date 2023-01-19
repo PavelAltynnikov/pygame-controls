@@ -1,6 +1,6 @@
 import pygame
 
-import controller
+import controllers
 import game_rules
 import model
 import settings
@@ -17,7 +17,7 @@ character = model.Character(model.Point(300, 300))
 
 controller_settings = settings.get_ui_settings(settings.PygameKeyboardControlSettings)
 # controller_ = controller.PygameKeyboardController(controller_settings)
-controller_ = controller.PygameGamepadController()
+controller_ = controllers.PygameGamepadController()
 mover = game_rules.Mover(controller_)
 
 settings_window = view.windows.SettingWindow(

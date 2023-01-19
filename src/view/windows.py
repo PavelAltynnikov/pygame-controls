@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-import controller
+import controllers
 import settings
 import game_rules
 from . import sprites
@@ -44,7 +44,7 @@ class SettingWindow(Window):
             caption,
             size,
             settings: settings.ControlSettings,
-            controller: controller.Controller):
+            controller: controllers.Controller):
         super().__init__(caption, size)
         self._settings = settings
         self._controller = controller

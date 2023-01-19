@@ -5,7 +5,7 @@ import pygame
 
 # Эти зависимости мешают тестировать модуль
 import settings
-import controller
+import controllers
 
 
 class Control(ABC):
@@ -46,7 +46,7 @@ class Key(Label):
             self,
             font,
             setting: settings.Setting,
-            control: controller.Control,
+            control: controllers.Control,
             antialias=False,
             color=(0, 0, 0),
             location=(0, 0)):
