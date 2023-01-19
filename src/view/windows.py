@@ -4,6 +4,7 @@ import pygame
 
 import controller
 import settings
+import game_rules
 from . import sprites
 from . import controls
 
@@ -193,7 +194,7 @@ class GameWindow(Window):
             caption: str,
             size: tuple[int, int],
             sprite: sprites.Sprite,
-            mover: controller.Mover):
+            mover: game_rules.Mover):
         super().__init__(caption, size)
         self._sprite = sprite
         self._mover = mover
