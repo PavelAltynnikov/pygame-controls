@@ -295,11 +295,11 @@ class MenuWindow(Window):
             control.click()
 
     def _change_active_button(self):
-        if self._controller.move_down.activated:
+        if self._controller.move_up.activated:
             self._selected_item_index -= 1
             if self._selected_item_index < 0:
                 self._selected_item_index = len(self._controls) - 1
-        elif self._controller.move_up.activated:
+        elif self._controller.move_down.activated:
             self._selected_item_index += 1
             if self._selected_item_index >= len(self._controls):
                 self._selected_item_index = 0

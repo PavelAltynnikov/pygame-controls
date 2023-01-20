@@ -121,6 +121,25 @@ class PygameKeyboard(Controller):
             self._move_down.activate()
 
 
+class PygameIntermittentKeyboard(PygameKeyboard):
+    def __init__(self, settings: ControllerSettings):
+        super().__init__(settings)
+
+    def conduct_survey_of_controls(self) -> None:
+        events = pygame.event.get()
+        for event in events:
+            if event.type != pygame.KEYDOWN:
+                continue
+            if self._move_right.key_number == event.key:
+                self._move_right.activate()
+            elif self._move_left.key_number == event.key:
+                self._move_left.activate()
+            elif self._move_up.key_number == event.key:
+                self._move_up.activate()
+            elif self._move_down.key_number == event.key:
+                self._move_down.activate()
+
+
 class GamePadAxe(Enum):
     LEFT_STICK_X = 0
     LEFT_STICK_Y = 1

@@ -1,7 +1,7 @@
 import pygame
 
 import view
-from controllers import PygameGamepad, PygameKeyboard
+from controllers import PygameGamepad, PygameKeyboard, PygameIntermittentKeyboard
 from game_rules import Mover
 from model import Character, Point
 from settings import PygameKeyboardSettings, get_ui_settings
@@ -18,13 +18,16 @@ character = Character(Point(300, 300))
 controller_settings = get_ui_settings(PygameKeyboardSettings)
 controller = PygameGamepad()
 controller = PygameKeyboard(controller_settings)
+# тут может быть проблема в том, что у одного из контроллеров не изменятся настройки
+# при изменении через свойства.
+intermittent_controller = PygameIntermittentKeyboard(controller_settings)
 mover = Mover(controller)
 
 settings_window = view.windows.SettingsWindow(
     caption="settings",
     size=SCREEN_SIZE,
     settings=controller_settings,
-    controller=controller
+    controller=intermittent_controller
 )
 
 game_window = view.windows.GameWindow(
@@ -37,7 +40,7 @@ game_window = view.windows.GameWindow(
 start_window = view.windows.MenuWindow(
     caption='Controls tests | Menu',
     size=SCREEN_SIZE,
-    controller=controller
+    controller=intermittent_controller
 )
 start_window.play_button_handlers.append(game_window.show)
 start_window.settings_button_handlers.append(settings_window.show)
