@@ -4,8 +4,8 @@ from typing import Callable
 import pygame
 
 # Эти зависимости мешают тестировать модуль
-import settings
 import controllers
+from settings import Setting
 
 
 class Control(ABC):
@@ -45,7 +45,7 @@ class Key(Label):
     def __init__(
             self,
             font,
-            setting: settings.Setting,
+            setting: Setting,
             control: controllers.Control,
             antialias=False,
             color=(0, 0, 0),

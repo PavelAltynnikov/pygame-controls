@@ -1,4 +1,4 @@
-import model
+from model import Character, Point
 from controllers import Controller
 
 
@@ -6,10 +6,10 @@ class Mover:
     def __init__(self, controller: Controller):
         self._controller = controller
 
-    def move_character(self, character: model.Character):
+    def move_character(self, character: Character):
         speed = 0
         character.move_to(
-            model.Point(
+            Point(
                 x=self._get_new_x(character.location.x, speed),
                 y=self._get_new_y(character.location.y, speed)
             )

@@ -1,10 +1,10 @@
 import pygame
 
-import controllers
-import game_rules
-import model
-import settings
 import view
+from controllers import PygameGamepadController, PygameKeyboardController
+from game_rules import Mover
+from model import Character, Point
+from settings import PygameKeyboardControlSettings, get_ui_settings
 
 
 SCREEN_SIZE = (1000, 500)
@@ -13,12 +13,12 @@ pygame.init()
 pygame.key.set_repeat(500)
 screen = pygame.display.set_mode(SCREEN_SIZE)
 
-character = model.Character(model.Point(300, 300))
+character = Character(Point(300, 300))
 
-controller_settings = settings.get_ui_settings(settings.PygameKeyboardControlSettings)
-# controller_ = controller.PygameKeyboardController(controller_settings)
-controller_ = controllers.PygameGamepadController()
-mover = game_rules.Mover(controller_)
+controller_settings = get_ui_settings(PygameKeyboardControlSettings)
+controller_ = PygameGamepadController()
+controller_ = PygameKeyboardController(controller_settings)
+mover = Mover(controller_)
 
 settings_window = view.windows.SettingWindow(
     caption="settings",

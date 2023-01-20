@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame
 
-import settings
+from settings import ControlSettings
 
 
 class Control:
@@ -102,7 +102,7 @@ class Controller(ABC):
 
 
 class PygameKeyboardController(Controller):
-    def __init__(self, settings: settings.ControlSettings):
+    def __init__(self, settings: ControlSettings):
         self._settings = settings
         self._move_right = Control(settings.right.value)
         self._move_up = Control(settings.up.value)

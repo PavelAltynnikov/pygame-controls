@@ -1,11 +1,11 @@
 import pygame
 
 # сомневаюсь что тут должна быть эта зависимость
-import model
+from model import Character
 
 
 class Sprite:
-    def __init__(self, model: model.Character):
+    def __init__(self, model: Character):
         self.surface = pygame.Surface((100, 100))
         self.surface.fill((250, 50, 50))
         self.rect = self.surface.get_rect()

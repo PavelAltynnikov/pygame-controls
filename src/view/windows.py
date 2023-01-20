@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-import controllers
-import settings
-import game_rules
-from . import sprites
-from . import controls
+from controllers import Controller
+from settings import ControlSettings
+from game_rules import Mover
+from .sprites import Sprite
+from .controls import Button, Control, Key, Label, RowSetting
 
 
 class Window(ABC):
@@ -15,7 +15,7 @@ class Window(ABC):
         self._size = size
         self._screen = pygame.display.set_mode(size)
         self._is_showing = True
-        self._controls: list[controls.Control] = []
+        self._controls: list[Control] = []
         pygame.display.set_caption(caption)
 
     @staticmethod
@@ -43,8 +43,8 @@ class SettingWindow(Window):
             self,
             caption,
             size,
-            settings: settings.ControlSettings,
-            controller: controllers.Controller):
+            settings: ControlSettings,
+            controller: Controller):
         super().__init__(caption, size)
         self._settings = settings
         self._controller = controller
@@ -52,9 +52,9 @@ class SettingWindow(Window):
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
-        right_setting = controls.RowSetting(
-            controls.Label(font, 'right'),
-            controls.Key(
+        right_setting = RowSetting(
+            Label(font, 'right'),
+            Key(
                 font=font,
                 setting=self._settings.right,
                 control=self._controller.move_right
@@ -63,9 +63,9 @@ class SettingWindow(Window):
         )
         right_setting.activate()
 
-        left_setting = controls.RowSetting(
-            controls.Label(font, 'left'),
-            controls.Key(
+        left_setting = RowSetting(
+            Label(font, 'left'),
+            Key(
                 font=font,
                 setting=self._settings.left,
                 control=self._controller.move_left
@@ -73,9 +73,9 @@ class SettingWindow(Window):
             location=(50, 80)
         )
 
-        up_setting = controls.RowSetting(
-            controls.Label(font, 'up'),
-            controls.Key(
+        up_setting = RowSetting(
+            Label(font, 'up'),
+            Key(
                 font=font,
                 setting=self._settings.up,
                 control=self._controller.move_up
@@ -83,9 +83,9 @@ class SettingWindow(Window):
             location=(50, 110)
         )
 
-        down_setting = controls.RowSetting(
-            controls.Label(font, 'down'),
-            controls.Key(
+        down_setting = RowSetting(
+            Label(font, 'down'),
+            Key(
                 font=font,
                 setting=self._settings.down,
                 control=self._controller.move_down
@@ -122,7 +122,7 @@ class SettingWindow(Window):
             return
 
         for i, setting in enumerate(self._controls):
-            if not isinstance(setting, controls.RowSetting):
+            if not isinstance(setting, RowSetting):
                 continue
             if i == self._selected_item_index:
                 setting.activate()
@@ -135,7 +135,7 @@ class SettingWindow(Window):
         if event.key != pygame.K_RETURN:
             return
         control = self._controls[self._selected_item_index]
-        if not isinstance(control, controls.RowSetting):
+        if not isinstance(control, RowSetting):
             return
 
         key_control = control.key
@@ -154,7 +154,7 @@ class SettingWindow(Window):
         key_control.deactivate()
 
     def _waiting_for_user_assign_new_key(
-            self, screen, key_control: controls.Key) -> int | None:
+            self, screen, key_control: Key) -> int | None:
         # TODO: тут дохера логики,
         # и ивенты, и черчение рамки и апдейт экрана.
         # Надо подумать как это сделать лаконичней.
@@ -193,8 +193,8 @@ class GameWindow(Window):
             self,
             caption: str,
             size: tuple[int, int],
-            sprite: sprites.Sprite,
-            mover: game_rules.Mover):
+            sprite: Sprite,
+            mover: Mover):
         super().__init__(caption, size)
         self._sprite = sprite
         self._mover = mover
@@ -240,7 +240,7 @@ class MenuWindow(Window):
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
 
-        button_play = controls.Button(
+        button_play = Button(
             font=font,
             text="play",
             antialias=False,
@@ -250,7 +250,7 @@ class MenuWindow(Window):
         button_play.add_click_handler(self._on_play_button_click)
         button_play.activate()
 
-        button_settings = controls.Button(
+        button_settings = Button(
             font=font,
             text="settings",
             antialias=False,
@@ -259,7 +259,7 @@ class MenuWindow(Window):
         )
         button_settings.add_click_handler(self._on_settings_button_click)
 
-        button_quit = controls.Button(
+        button_quit = Button(
             font=font,
             text="quit",
             antialias=False,
@@ -289,7 +289,7 @@ class MenuWindow(Window):
             if event.key != pygame.K_RETURN:
                 continue
             control = self._controls[self._selected_item_index]
-            if not isinstance(control, controls.Button):
+            if not isinstance(control, Button):
                 continue
 
             control.click()
@@ -308,7 +308,7 @@ class MenuWindow(Window):
                 else:
                     return
                 for i, button in enumerate(self._controls):
-                    if not isinstance(button, controls.Button):
+                    if not isinstance(button, Button):
                         continue
                     if i == self._selected_item_index:
                         button.activate()
