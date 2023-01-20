@@ -20,7 +20,7 @@ controller = PygameGamepad()
 controller = PygameKeyboard(controller_settings)
 mover = Mover(controller)
 
-settings_window = view.windows.SettingWindow(
+settings_window = view.windows.SettingsWindow(
     caption="settings",
     size=SCREEN_SIZE,
     settings=controller_settings,

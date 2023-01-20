@@ -38,7 +38,7 @@ class Window(ABC):
         self._is_showing = False
 
 
-class SettingWindow(Window):
+class SettingsWindow(Window):
     def __init__(
             self,
             caption,
@@ -104,9 +104,11 @@ class SettingWindow(Window):
         for control in self._controls:
             control.draw(self._screen)
 
-    def _event_handler(self, events):
+    def _events_handler(self):
+        self._change_active_setting()
+        events = pygame.event.get()
+        self._quit_if_user_wants_to_close_window(events)
         for event in events:
-            self._change_active_setting()
             self._change_key_value(event)
 
     def _change_active_setting(self):
@@ -174,10 +176,7 @@ class SettingWindow(Window):
         blue_color = (0, 49, 83)
         while self._is_showing:
             self._controller.conduct_survey_of_controls()
-
-            events = pygame.event.get()
-            self._quit_if_user_wants_to_close_window(events)
-            self._event_handler(events)
+            self._events_handler()
 
             self._screen.fill(blue_color)
             self._draw()
