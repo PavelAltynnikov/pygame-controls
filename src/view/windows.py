@@ -230,8 +230,9 @@ class GameWindow(Window):
 
 
 class MenuWindow(Window):
-    def __init__(self, caption, size):
+    def __init__(self, caption, size, controller: Controller):
         super().__init__(caption, size)
+        self._controller = controller
         self.play_button_handlers = []
         self.settings_button_handlers = []
         self._initialize_components()
@@ -278,7 +279,7 @@ class MenuWindow(Window):
     def _events_handler(self):
         events = pygame.event.get()
         self._quit_if_user_wants_to_close_window(events)
-        self._change_active_button(events)
+        self._change_active_button()
         self._click_on_button(events)
 
     def _click_on_button(self, events):
@@ -293,26 +294,25 @@ class MenuWindow(Window):
 
             control.click()
 
-    def _change_active_button(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    self._selected_item_index += 1
-                    if self._selected_item_index >= len(self._controls):
-                        self._selected_item_index = 0
-                elif event.key == pygame.K_UP:
-                    self._selected_item_index -= 1
-                    if self._selected_item_index < 0:
-                        self._selected_item_index = len(self._controls) - 1
-                else:
-                    return
-                for i, button in enumerate(self._controls):
-                    if not isinstance(button, Button):
-                        continue
-                    if i == self._selected_item_index:
-                        button.activate()
-                    else:
-                        button.deactivate()
+    def _change_active_button(self):
+        if self._controller.move_down.activated:
+            self._selected_item_index -= 1
+            if self._selected_item_index < 0:
+                self._selected_item_index = len(self._controls) - 1
+        elif self._controller.move_up.activated:
+            self._selected_item_index += 1
+            if self._selected_item_index >= len(self._controls):
+                self._selected_item_index = 0
+        else:
+            return
+
+        for i, control in enumerate(self._controls):
+            if not isinstance(control, Button):
+                continue
+            if i == self._selected_item_index:
+                control.activate()
+            else:
+                control.deactivate()
 
     def _draw(self):
         for control in self._controls:
@@ -332,10 +332,14 @@ class MenuWindow(Window):
     def show(self):
         gray_color = (156, 156, 156)
         while self._is_showing:
+            self._controller.conduct_survey_of_controls()
             self._events_handler()
 
             self._screen.fill(gray_color)
             self._draw()
 
             pygame.display.update()
+
+            self._controller.deactivate_all_controls()
+
         self._is_showing = True
