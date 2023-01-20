@@ -14,7 +14,7 @@ class Setting:
         return str(self.value)
 
 
-class ControlSettings(ABC):
+class ControllerSettings(ABC):
     def __init__(self, right: Setting, left: Setting, up: Setting, down: Setting):
         self.right = right
         self.left = left
@@ -26,12 +26,12 @@ class ControlSettings(ABC):
             file.write(json.dumps(self.__dict__, default=lambda o: o.__dict__))
 
 
-class PygameKeyboardControlSettings(ControlSettings):
+class PygameKeyboardSettings(ControllerSettings):
     def __init__(self, right, left, up, down):
         super().__init__(right, left, up, down)
 
 
-def get_ui_settings(settings_type: type[ControlSettings]) -> ControlSettings:
+def get_ui_settings(settings_type: type[ControllerSettings]) -> ControllerSettings:
     with open(SETTINGS_FILE_PATH, 'r') as file:
         data = json.loads(''.join(file.readlines()))
         return settings_type(**{k: Setting(v["value"]) for k, v in data.items()})

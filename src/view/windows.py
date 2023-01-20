@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import pygame
 
 from controllers import Controller
-from settings import ControlSettings
+from settings import ControllerSettings
 from game_rules import Mover
 from .sprites import Sprite
 from .controls import Button, Control, Key, Label, RowSetting
@@ -43,7 +43,7 @@ class SettingWindow(Window):
             self,
             caption,
             size,
-            settings: ControlSettings,
+            settings: ControllerSettings,
             controller: Controller):
         super().__init__(caption, size)
         self._settings = settings
