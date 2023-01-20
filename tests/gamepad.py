@@ -75,7 +75,7 @@ def _start_loop(screen, color, game_pad: pygame.joystick.Joystick):
         clock.tick(fps)
 
 
-def _render_labels(game_pad, text):
+def _render_labels(game_pad: pygame.joystick.Joystick, text):
     text.render(
         f"LSx={round(game_pad.get_axis(GamePadAxe.LEFT_STICK_X.value), 2)}",
         (10, 10)
@@ -100,22 +100,16 @@ def _render_labels(game_pad, text):
         f"RT={round(game_pad.get_axis(GamePadAxe.RIGHT_TRIGGER.value), 2)}",
         (10, 135)
     )
-    text.render(f"A={round(game_pad.get_button(GamePadButton.A.value), 2)}", (10, 160))
-    text.render(f"B={round(game_pad.get_button(GamePadButton.B.value), 2)}", (10, 185))
-    text.render(f"X={round(game_pad.get_button(GamePadButton.X.value), 2)}", (10, 210))
-    text.render(f"Y={round(game_pad.get_button(GamePadButton.Y.value), 2)}", (10, 235))
-    text.render(
-        f"LB={round(game_pad.get_button(GamePadButton.LB.value), 2)}",
-        (10, 260)
-    )
-    text.render(
-        f"RB={round(game_pad.get_button(GamePadButton.RB.value), 2)}",
-        (10, 285)
-    )
-    text.render(
-        f"start={round(game_pad.get_button(GamePadButton.START.value), 2)}",
-        (10, 310)
-    )
+    text.render(f"A={game_pad.get_button(GamePadButton.A.value)}", (10, 160))
+    text.render(f"B={game_pad.get_button(GamePadButton.B.value)}", (10, 185))
+    text.render(f"X={game_pad.get_button(GamePadButton.X.value)}", (10, 210))
+    text.render(f"Y={game_pad.get_button(GamePadButton.Y.value)}", (10, 235))
+    text.render(f"LB={game_pad.get_button(GamePadButton.LB.value)}", (10, 260))
+    text.render(f"RB={game_pad.get_button(GamePadButton.RB.value)}", (10, 285))
+    text.render(f"start={game_pad.get_button(GamePadButton.START.value)}", (10, 310))
+    text.render(f"??={game_pad.get_button(8)}", (10, 335))
+    text.render(f"??={game_pad.get_button(9)}", (10, 360))
+    text.render(f"??={game_pad.get_button(10)}", (10, 385))
 
 
 def _quit_button_is_pressed(event):
