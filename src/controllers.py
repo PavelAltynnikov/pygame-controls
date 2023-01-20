@@ -101,7 +101,7 @@ class Controller(ABC):
         self._move_down.deactivate()
 
 
-class PygameKeyboardController(Controller):
+class PygameKeyboard(Controller):
     def __init__(self, settings: ControllerSettings):
         self._settings = settings
         self._move_right = Control(settings.right.value)
@@ -141,7 +141,7 @@ class GamePadButton(Enum):
     START = 7
 
 
-class PygameGamepadController(Controller):
+class PygameGamepad(Controller):
     def __init__(self):
         # Конструктор должен принимать геймпад, потому что играть можно на нескольких
         # геймпадах одновременно.
