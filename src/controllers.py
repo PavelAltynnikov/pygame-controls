@@ -208,29 +208,45 @@ class PygameGamepad(Controller):
 
     def conduct_survey_of_controls(self, events) -> None:
         self._try_to_activate_stick_directions(
+            axe=GamePadAxe.LEFT_STICK_X,
             positive_direction=self._move_right,
-            negative_direction=self._move_left,
-            axe=GamePadAxe.LEFT_STICK_X
+            negative_direction=self._move_left
         )
         self._try_to_activate_stick_directions(
+            axe=GamePadAxe.LEFT_STICK_Y,
             positive_direction=self._move_down,
-            negative_direction=self._move_up,
-            axe=GamePadAxe.LEFT_STICK_Y
+            negative_direction=self._move_up
         )
         self._try_to_activate_button(self._accept)
         self._try_to_activate_button(self._quit)
 
     def _try_to_activate_stick_directions(
-            self,
-            positive_direction: Control,
-            negative_direction: Control,
-            axe: GamePadAxe) -> None:
-        if value := self._game_pad.get_axis(axe.value):
-            if abs(value) > self._dead_zone:
-                if value > 0:
-                    positive_direction.activate(value)
-                else:
-                    negative_direction.activate(value)
+        self,
+        axe: GamePadAxe,
+        positive_direction: Control,
+        negative_direction: Control
+    ) -> None:
+        """Метод активирует одно из направлений выбранной оси стика
+        если стик физического устройства был активирован.
+
+        Args:
+            axe: Одна из осей стика.
+            positive_direction: Элемент управления контроллера,
+            отвечающий за позитивное направление выбранной оси.
+            negative_direction: Элемент управления контроллера,
+            отвечающий за отрицательное направление выбранной оси.
+        """
+        value = self._game_pad.get_axis(axe.value)
+        if not value:
+            return
+
+        if abs(value) <= self._dead_zone:
+            return
+
+        if value > 0:
+            positive_direction.activate(value)
+        else:
+            negative_direction.activate(value)
 
     def _try_to_activate_button(self, button: Control) -> None:
         if self._game_pad.get_button(button.key_number):
