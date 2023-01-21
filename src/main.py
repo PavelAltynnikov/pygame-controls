@@ -20,6 +20,7 @@ controller = PygameGamepad()
 controller = PygameKeyboard(controller_settings)
 # тут может быть проблема в том, что у одного из контроллеров не изменятся настройки
 # при изменении через свойства.
+# Да, проблема подтвердилась(.
 intermittent_controller = PygameIntermittentKeyboard(controller_settings)
 mover = Mover(controller)
 

@@ -105,11 +105,14 @@ class SettingsWindow(Window):
             control.draw(self._screen)
 
     def _events_handler(self):
+        self._quit_if_user_wants_to_close_window()
         self._change_active_setting()
-        events = pygame.event.get()
-        self._quit_if_user_wants_to_close_window(events)
-        for event in events:
-            self._change_key_value(event)
+        self._change_key_value()
+
+    def _quit_if_user_wants_to_close_window(self):
+        if not self._controller.quit.activated:
+            return
+        self.quit()
 
     def _change_active_setting(self):
         if self._controller.move_up.activated:
@@ -131,36 +134,39 @@ class SettingsWindow(Window):
             else:
                 setting.deactivate()
 
-    def _change_key_value(self, event):
-        if event.type != pygame.KEYDOWN:
-            return
-        if event.key != pygame.K_RETURN:
-            return
-        control = self._controls[self._selected_item_index]
-        if not isinstance(control, RowSetting):
-            return
+    def _change_key_value(self):
+        if self._controller.accept.activated:
+            control = self._controls[self._selected_item_index]
+            if not isinstance(control, RowSetting):
+                return
 
-        key_control = control.key
-        key_control.activate()
+            key_control = control.key
+            key_control.activate()
 
-        key_number = self._waiting_for_user_assign_new_key(self._screen, key_control)
-        if key_number is None:
-            return
+            key_number = self._waiting_for_user_assign_new_key(
+                self._screen,
+                key_control
+            )
+            if key_number is None:
+                return
 
-        key_control.change_text(pygame.key.name(key_number))
-        key_control._control.update_key_number(key_number)
+            key_control.change_text(pygame.key.name(key_number))
+            key_control._control.update_key_number(key_number)
 
-        key_control._setting.value = key_number
-        self._settings.save()
+            key_control._setting.value = key_number
+            self._settings.save()
 
-        key_control.deactivate()
+            key_control.deactivate()
 
     def _waiting_for_user_assign_new_key(
             self, screen, key_control: Key) -> int | None:
-        # TODO: тут дохера логики,
+        # TODO: Тут дохера логики,
         # и ивенты, и черчение рамки и апдейт экрана.
         # Надо подумать как это сделать лаконичней.
         while True:
+            # TODO: Использовать контроллер.
+            # Но чтобы это сделать,
+            # нужно чтобы контроллер смог отдать любую нажатую клавишу.
             for event in pygame.event.get():
                 if event.type != pygame.KEYDOWN:
                     continue
@@ -273,26 +279,25 @@ class MenuWindow(Window):
         self._controls.append(button_settings)
         self._controls.append(button_quit)
 
-    def _quit(self):
-        self._is_showing = False
-
     def _events_handler(self):
-        events = pygame.event.get()
-        self._quit_if_user_wants_to_close_window(events)
+        self._quit_if_user_wants_to_close_window()
         self._change_active_button()
-        self._click_on_button(events)
+        self._click_on_button()
 
-    def _click_on_button(self, events):
-        for event in events:
-            if event.type != pygame.KEYDOWN:
-                continue
-            if event.key != pygame.K_RETURN:
-                continue
-            control = self._controls[self._selected_item_index]
-            if not isinstance(control, Button):
-                continue
+    def _quit_if_user_wants_to_close_window(self):
+        if not self._controller.quit.activated:
+            return
+        self.quit()
 
-            control.click()
+    def _click_on_button(self):
+        if not self._controller.accept.activated:
+            return
+
+        control = self._controls[self._selected_item_index]
+        if not isinstance(control, Button):
+            return
+
+        control.click()
 
     def _change_active_button(self):
         if self._controller.move_up.activated:
@@ -319,15 +324,17 @@ class MenuWindow(Window):
             control.draw(self._screen)
 
     def _on_play_button_click(self):
+        self._controller.deactivate_all_controls()
         for handler in self.play_button_handlers:
             handler()
 
     def _on_settings_button_click(self):
+        self._controller.deactivate_all_controls()
         for handler in self.settings_button_handlers:
             handler()
 
     def _on_quit_button_click_handler(self):
-        self._quit()
+        self.quit()
 
     def show(self):
         gray_color = (156, 156, 156)

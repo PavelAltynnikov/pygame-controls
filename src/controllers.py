@@ -54,6 +54,8 @@ class Controller(ABC):
         self._move_right = Control(0)
         self._move_down = Control(0)
         self._move_left = Control(0)
+        self._accept = Control(0)
+        self._quit = Control(0)
 
     @property
     def move_right(self):
@@ -87,6 +89,14 @@ class Controller(ABC):
     def move_down(self, value: Control):
         self._move_down = value
 
+    @property
+    def accept(self):
+        return self._accept
+
+    @property
+    def quit(self):
+        return self._quit
+
     @abstractmethod
     def conduct_survey_of_controls(self) -> None:
         '''Метод который нужно вызывать при каждой итерации игрового цикла
@@ -99,6 +109,8 @@ class Controller(ABC):
         self._move_left.deactivate()
         self._move_up.deactivate()
         self._move_down.deactivate()
+        self._accept.deactivate()
+        self._quit.deactivate()
 
 
 class PygameKeyboard(Controller):
@@ -108,6 +120,8 @@ class PygameKeyboard(Controller):
         self._move_up = Control(settings.up.value)
         self._move_left = Control(settings.left.value)
         self._move_down = Control(settings.down.value)
+        self._accept = Control(pygame.K_RETURN)
+        self._quit = Control(pygame.K_ESCAPE)
 
     def conduct_survey_of_controls(self) -> None:
         keys = pygame.key.get_pressed()
@@ -119,6 +133,10 @@ class PygameKeyboard(Controller):
             self._move_up.activate()
         if keys[self._move_down.key_number]:
             self._move_down.activate()
+        if keys[self._accept.key_number]:
+            self._accept.activate()
+        if keys[self._quit.key_number]:
+            self._quit.activate()
 
 
 class PygameIntermittentKeyboard(PygameKeyboard):
@@ -138,6 +156,10 @@ class PygameIntermittentKeyboard(PygameKeyboard):
                 self._move_up.activate()
             elif self._move_down.key_number == event.key:
                 self._move_down.activate()
+            if self._accept.key_number == event.key:
+                self._accept.activate()
+            elif self._quit.key_number == event.key:
+                self._quit.activate()
 
 
 class GamePadAxe(Enum):
@@ -174,6 +196,8 @@ class PygameGamepad(Controller):
         self._move_right = Control(GamePadAxe.LEFT_STICK_X.value)
         self._move_down = Control(GamePadAxe.LEFT_STICK_Y.value)
         self._move_left = Control(GamePadAxe.LEFT_STICK_X.value)
+        self._accept = Control(GamePadButton.A.value)
+        self._quit = Control(GamePadButton.B.value)
 
     def conduct_survey_of_controls(self) -> None:
         if value := self._game_pad.get_axis(GamePadAxe.LEFT_STICK_X.value):
@@ -188,3 +212,7 @@ class PygameGamepad(Controller):
                     self._move_up.activate(value)
                 else:
                     self._move_down.activate(value)
+        if self._game_pad.get_button(self._accept.key_number):
+            self._accept.activate()
+        if self._game_pad.get_button(self._quit.key_number):
+            self._quit.activate()
