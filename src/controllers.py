@@ -138,6 +138,9 @@ class PygameKeyboard(Controller):
         if keys[self._quit.key_number]:
             self._quit.activate()
 
+    def __str__(self):
+        return "Keyboard"
+
 
 class PygameIntermittentKeyboard(PygameKeyboard):
     def __init__(self, settings: ControllerSettings):
@@ -216,3 +219,6 @@ class PygameGamepad(Controller):
             self._accept.activate()
         if self._game_pad.get_button(self._quit.key_number):
             self._quit.activate()
+
+    def __str__(self):
+        return self._game_pad.get_name()
