@@ -165,6 +165,9 @@ class PygameIntermittentKeyboard(PygameKeyboard):
             elif self._quit.key_number == event.key:
                 self._quit.activate()
 
+    def __str__(self):
+        return "Intermittent Keyboard"
+
 
 class GamePadAxe(Enum):
     LEFT_STICK_X = 0
