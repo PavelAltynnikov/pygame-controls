@@ -98,9 +98,11 @@ class Controller(ABC):
         return self._quit
 
     @abstractmethod
-    def conduct_survey_of_controls(self) -> None:
+    def conduct_survey_of_controls(self, events: list[pygame.event.Event]) -> None:
         '''Метод который нужно вызывать при каждой итерации игрового цикла
         чтобы понять какие котролы на контроллере были активированы.
+        Получение значений c физического устройства осуществляется только после
+        получения событий pygame.
         '''
         ...
 
@@ -123,7 +125,7 @@ class PygameKeyboard(Controller):
         self._accept = Control(pygame.K_RETURN)
         self._quit = Control(pygame.K_ESCAPE)
 
-    def conduct_survey_of_controls(self) -> None:
+    def conduct_survey_of_controls(self, events) -> None:
         keys = pygame.key.get_pressed()
         if keys[self._move_right.key_number]:
             self._move_right.activate()
@@ -146,8 +148,7 @@ class PygameIntermittentKeyboard(PygameKeyboard):
     def __init__(self, settings: ControllerSettings):
         super().__init__(settings)
 
-    def conduct_survey_of_controls(self) -> None:
-        events = pygame.event.get()
+    def conduct_survey_of_controls(self, events) -> None:
         for event in events:
             if event.type != pygame.KEYDOWN:
                 continue
@@ -202,7 +203,7 @@ class PygameGamepad(Controller):
         self._accept = Control(GamePadButton.A.value)
         self._quit = Control(GamePadButton.B.value)
 
-    def conduct_survey_of_controls(self) -> None:
+    def conduct_survey_of_controls(self, events) -> None:
         if value := self._game_pad.get_axis(GamePadAxe.LEFT_STICK_X.value):
             if abs(value) > self._dead_zone:
                 if value > 0:
