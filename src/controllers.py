@@ -8,7 +8,7 @@ from .settings import ControllerSettings
 
 class Control:
     """Представляет один элемент управления на каком либо устройстве ввода.
-    Это может быть клавиатура, геймпад, дойстик и т.д.
+    Это может быть клавиатура, геймпад, джойстик и т.д.
     """
     def __init__(self, key_number: int):
         self._key_number = key_number
@@ -185,7 +185,7 @@ class GamePadButton(Enum):
     Y = 3
     LB = 4
     RB = 5
-    # элемента с номером 6 на моём геймпаде не оказалось
+    # элемента с номером 6 на моём Logitech F310 не оказалось
     START = 7
 
 
@@ -207,22 +207,34 @@ class PygameGamepad(Controller):
         self._quit = Control(GamePadButton.B.value)
 
     def conduct_survey_of_controls(self, events) -> None:
-        if value := self._game_pad.get_axis(GamePadAxe.LEFT_STICK_X.value):
+        self._try_to_activate_stick_directions(
+            positive_direction=self._move_right,
+            negative_direction=self._move_left,
+            axe=GamePadAxe.LEFT_STICK_X
+        )
+        self._try_to_activate_stick_directions(
+            positive_direction=self._move_down,
+            negative_direction=self._move_up,
+            axe=GamePadAxe.LEFT_STICK_Y
+        )
+        self._try_to_activate_button(self._accept)
+        self._try_to_activate_button(self._quit)
+
+    def _try_to_activate_stick_directions(
+            self,
+            positive_direction: Control,
+            negative_direction: Control,
+            axe: GamePadAxe) -> None:
+        if value := self._game_pad.get_axis(axe.value):
             if abs(value) > self._dead_zone:
                 if value > 0:
-                    self._move_right.activate(value)
+                    positive_direction.activate(value)
                 else:
-                    self._move_left.activate(value)
-        if value := self._game_pad.get_axis(GamePadAxe.LEFT_STICK_Y.value):
-            if abs(value) > self._dead_zone:
-                if value < 0:
-                    self._move_up.activate(value)
-                else:
-                    self._move_down.activate(value)
-        if self._game_pad.get_button(self._accept.key_number):
-            self._accept.activate()
-        if self._game_pad.get_button(self._quit.key_number):
-            self._quit.activate()
+                    negative_direction.activate(value)
+
+    def _try_to_activate_button(self, button: Control) -> None:
+        if self._game_pad.get_button(button.key_number):
+            button.activate()
 
     def __str__(self):
         return self._game_pad.get_name()
