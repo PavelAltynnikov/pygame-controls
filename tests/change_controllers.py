@@ -1,6 +1,8 @@
 import pygame
 
-from src.controllers import Controller, PygameKeyboard, PygameGamepad
+from src.controllers import (
+    Controller, PygameKeyboard, PygameGamepad, PygameIntermittentKeyboard
+)
 from src.settings import ControllerSettings, Setting
 
 pygame.init()
@@ -21,22 +23,22 @@ class Text:
 
 class Test:
     def __init__(self):
+        settings = ControllerSettings(
+            right=Setting(1073741903),
+            left=Setting(1073741904),
+            up=Setting(1073741906),
+            down=Setting(1073741905),
+        )
         self._controllers: list[Controller] = [
-            PygameKeyboard(
-                ControllerSettings(
-                    right=Setting(1073741903),
-                    left=Setting(1073741904),
-                    up=Setting(1073741906),
-                    down=Setting(1073741905),
-                )
-            ),
+            PygameKeyboard(settings),
+            PygameIntermittentKeyboard(settings),
             PygameGamepad()
         ]
         self._controller_index = 0
         self._controller = self._controllers[self._controller_index]
 
     def _render_labels(self, text):
-        text.render("For change controller press \"c\" on a keyboard", (10, 10))
+        text.render("For change controller press \"accept\" on a keyboard", (10, 10))
         text.render(f"current controller: {self._controller}", (10, 35))
         text.render(f"up={self._controller.move_up._activated}", (10, 60))
         text.render(f"right={self._controller.move_right._activated}", (10, 85))
@@ -51,24 +53,12 @@ class Test:
             or (event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, ))
         )
 
-    def _is_user_wants_to_close_window(self, events):
-        for event in events:
-            if self._quit_button_is_pressed(event):
-                return True
-        return False
-
-    def _change_controller(self, events) -> None:
-        for event in events:
-            if event.type != pygame.KEYDOWN:
-                return
-            if event.key != pygame.K_c:
-                return
-            if self._controller_index == 0:
-                self._controller_index = 1
-            else:
+    def _change_controller(self) -> None:
+        if self._controller.accept.activated:
+            self._controller_index += 1
+            if self._controller_index == len(self._controllers):
                 self._controller_index = 0
             self._controller = self._controllers[self._controller_index]
-            return
 
     def _start_loop(self, screen, color):
         close_window = False
@@ -81,10 +71,11 @@ class Test:
 
         while not close_window:
             events = pygame.event.get()
-            close_window = self._is_user_wants_to_close_window(events)
+            self._controller.conduct_survey_of_controls(events)
 
-            self._change_controller(events)
-            self._controller.conduct_survey_of_controls()
+            if self._controller.quit.activated:
+                return
+            self._change_controller()
 
             screen.fill(color)
             self._render_labels(text)
