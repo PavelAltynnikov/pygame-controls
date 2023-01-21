@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame
 
-from settings import ControllerSettings
+from .settings import ControllerSettings
 
 
 class Control:
