@@ -10,32 +10,30 @@ from .controls import Button, Control, Key, Label, RowSetting
 
 
 class Window(ABC):
-    def __init__(self, caption: str, size: tuple[int, int]):
+    def __init__(self, caption: str, size: tuple[int, int], controller: Controller):
+        self._background_color: tuple[int, int, int] = (80, 80, 80)
         self._caption = caption
-        self._size = size
-        self._screen = pygame.display.set_mode(size)
-        self._is_showing = True
         self._controls: list[Control] = []
+        self._controller = controller
+        self._is_showing = True
+        self._screen = pygame.display.set_mode(size)
+        self._size = size
         pygame.display.set_caption(caption)
-
-    @staticmethod
-    def _quit_button_is_pressed(event):
-        return (
-            event.type == pygame.QUIT
-            or (event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, ))
-        )
-
-    def _quit_if_user_wants_to_close_window(self, events):
-        for event in events:
-            if self._quit_button_is_pressed(event):
-                self.quit()
 
     @abstractmethod
     def show(self):
-        pass
+        ...
 
     def quit(self):
         self._is_showing = False
+
+    def _events_handler(self):
+        self._quit_if_user_wants_to_close_window()
+
+    def _quit_if_user_wants_to_close_window(self):
+        if not self._controller.quit.activated:
+            return
+        self.quit()
 
 
 class SettingsWindow(Window):
@@ -45,10 +43,26 @@ class SettingsWindow(Window):
             size,
             settings: ControllerSettings,
             controller: Controller):
-        super().__init__(caption, size)
+        super().__init__(caption, size, controller)
+        self._background_color = (0, 49, 83)
         self._settings = settings
-        self._controller = controller
         self._initialize_components()
+
+    def show(self):
+        fps = 30
+        clock = pygame.time.Clock()
+
+        while self._is_showing:
+            events = pygame.event.get()
+            self._controller.conduct_survey_of_controls(events)
+            self._events_handler()
+
+            self._draw_all_components()
+
+            self._controller.deactivate_all_controls()
+            clock.tick(fps)
+
+        self._is_showing = True
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
@@ -100,19 +114,16 @@ class SettingsWindow(Window):
 
         self._selected_item_index = 0
 
-    def _draw(self):
-        for control in self._controls:
-            control.draw(self._screen)
-
     def _events_handler(self):
-        self._quit_if_user_wants_to_close_window()
+        super()._events_handler()
         self._change_active_setting()
         self._change_key_value()
 
-    def _quit_if_user_wants_to_close_window(self):
-        if not self._controller.quit.activated:
-            return
-        self.quit()
+    def _draw_all_components(self):
+        self._screen.fill(self._background_color)
+        for control in self._controls:
+            control.draw(self._screen)
+        pygame.display.update()
 
     def _change_active_setting(self):
         if self._controller.move_up.activated:
@@ -143,10 +154,7 @@ class SettingsWindow(Window):
             key_control = control.key
             key_control.activate()
 
-            key_number = self._waiting_for_user_assign_new_key(
-                self._screen,
-                key_control
-            )
+            key_number = self._waiting_for_user_assign_new_key(key_control)
             if key_number is None:
                 return
 
@@ -158,8 +166,7 @@ class SettingsWindow(Window):
 
             key_control.deactivate()
 
-    def _waiting_for_user_assign_new_key(
-            self, screen, key_control: Key) -> int | None:
+    def _waiting_for_user_assign_new_key(self, key_control: Key) -> int | None:
         # TODO: Тут дохера логики,
         # и ивенты, и черчение рамки и апдейт экрана.
         # Надо подумать как это сделать лаконичней.
@@ -175,27 +182,8 @@ class SettingsWindow(Window):
                 # TODO: Добавить список возможных клавиш для назначения
                 else:
                     return event.key
-            key_control.draw_frame(screen)
+            key_control.draw_frame(self._screen)
             pygame.display.update()
-
-    def show(self):
-        blue_color = (0, 49, 83)
-        fps = 30
-        clock = pygame.time.Clock()
-
-        while self._is_showing:
-            events = pygame.event.get()
-            self._controller.conduct_survey_of_controls(events)
-            self._events_handler()
-
-            self._screen.fill(blue_color)
-            self._draw()
-            pygame.display.update()
-
-            self._controller.deactivate_all_controls()
-            clock.tick(fps)
-
-        self._is_showing = True
 
 
 class GameWindow(Window):
@@ -204,49 +192,63 @@ class GameWindow(Window):
             caption: str,
             size: tuple[int, int],
             sprite: Sprite,
-            mover: Mover):
-        super().__init__(caption, size)
+            mover: Mover,
+            controller: Controller):
+        super().__init__(caption, size, controller)
+        self._background_color = (30, 89, 89)
         self._sprite = sprite
         self._mover = mover
 
-    def _quit(self):
-        self._is_showing = False
+    def show(self):
+        while self._is_showing:
+            events = pygame.event.get()
+            self._mover._controller.conduct_survey_of_controls(events)
+            self._events_handler()
+
+            self._move_all_objects()
+            self._update_all_objects()
+            self._draw_all_components()
+
+            self._mover._controller.deactivate_all_controls()
+
+        self._is_showing = True
 
     def _move_all_objects(self):
-        # вот это полная хуйня из-за _sprite._character
+        # TODO: вот это полная хуйня из-за _sprite._character
         self._mover.move_character(character=self._sprite._character)
 
     def _update_all_objects(self):
         self._sprite.update()
 
-    def _draw_all(self, background_color):
-        self._screen.fill(background_color)
+    def _draw_all_components(self):
+        self._screen.fill(self._background_color)
         self._sprite.draw(self._screen)
-
-    def show(self):
-        green = (30, 89, 89)
-        while self._is_showing:
-            events = pygame.event.get()
-            self._quit_if_user_wants_to_close_window(events)
-            self._mover._controller.conduct_survey_of_controls(events)
-
-            self._move_all_objects()
-            self._update_all_objects()
-            self._draw_all(background_color=green)
-
-            self._mover._controller.deactivate_all_controls()
-            pygame.display.update()
-
-        self._is_showing = True
+        pygame.display.update()
 
 
 class MenuWindow(Window):
     def __init__(self, caption, size, controller: Controller):
-        super().__init__(caption, size)
-        self._controller = controller
+        super().__init__(caption, size, controller)
+        self._background_color = (156, 156, 156)
         self.play_button_handlers = []
         self.settings_button_handlers = []
         self._initialize_components()
+
+    def show(self):
+        fps = 30
+        clock = pygame.time.Clock()
+
+        while self._is_showing:
+            events = pygame.event.get()
+            self._controller.conduct_survey_of_controls(events)
+            self._events_handler()
+
+            self._draw_all_components()
+
+            self._controller.deactivate_all_controls()
+            clock.tick(fps)
+
+        self._is_showing = True
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
@@ -285,14 +287,9 @@ class MenuWindow(Window):
         self._controls.append(button_quit)
 
     def _events_handler(self):
-        self._quit_if_user_wants_to_close_window()
+        super()._events_handler()
         self._change_active_button()
         self._click_on_button()
-
-    def _quit_if_user_wants_to_close_window(self):
-        if not self._controller.quit.activated:
-            return
-        self.quit()
 
     def _click_on_button(self):
         if not self._controller.accept.activated:
@@ -324,9 +321,11 @@ class MenuWindow(Window):
             else:
                 control.deactivate()
 
-    def _draw(self):
+    def _draw_all_components(self):
+        self._screen.fill(self._background_color)
         for control in self._controls:
             control.draw(self._screen)
+        pygame.display.update()
 
     def _on_play_button_click(self):
         self._controller.deactivate_all_controls()
@@ -340,23 +339,3 @@ class MenuWindow(Window):
 
     def _on_quit_button_click_handler(self):
         self.quit()
-
-    def show(self):
-        gray_color = (156, 156, 156)
-        fps = 30
-        clock = pygame.time.Clock()
-
-        while self._is_showing:
-            events = pygame.event.get()
-            self._controller.conduct_survey_of_controls(events)
-            self._events_handler()
-
-            self._screen.fill(gray_color)
-            self._draw()
-
-            pygame.display.update()
-
-            self._controller.deactivate_all_controls()
-            clock.tick(fps)
-
-        self._is_showing = True
