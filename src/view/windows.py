@@ -180,6 +180,9 @@ class SettingsWindow(Window):
 
     def show(self):
         blue_color = (0, 49, 83)
+        fps = 30
+        clock = pygame.time.Clock()
+
         while self._is_showing:
             events = pygame.event.get()
             self._controller.conduct_survey_of_controls(events)
@@ -190,6 +193,7 @@ class SettingsWindow(Window):
             pygame.display.update()
 
             self._controller.deactivate_all_controls()
+            clock.tick(fps)
 
         self._is_showing = True
 
