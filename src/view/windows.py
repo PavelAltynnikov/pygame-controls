@@ -2,10 +2,11 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-import controller
-import settings
-from . import sprites
-from . import controls
+from controllers import Controller
+from settings import ControllerSettings
+from game_rules import Mover
+from .sprites import Sprite
+from .controls import Button, Control, Key, Label, RowSetting
 
 
 class Window(ABC):
@@ -14,7 +15,7 @@ class Window(ABC):
         self._size = size
         self._screen = pygame.display.set_mode(size)
         self._is_showing = True
-        self._controls: list[controls.Control] = []
+        self._controls: list[Control] = []
         pygame.display.set_caption(caption)
 
     @staticmethod
@@ -37,13 +38,13 @@ class Window(ABC):
         self._is_showing = False
 
 
-class SettingWindow(Window):
+class SettingsWindow(Window):
     def __init__(
             self,
             caption,
             size,
-            settings: settings.ControlSettings,
-            controller: controller.Controller):
+            settings: ControllerSettings,
+            controller: Controller):
         super().__init__(caption, size)
         self._settings = settings
         self._controller = controller
@@ -51,9 +52,9 @@ class SettingWindow(Window):
 
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
-        right_setting = controls.RowSetting(
-            controls.Label(font, 'right'),
-            controls.Key(
+        right_setting = RowSetting(
+            Label(font, 'right'),
+            Key(
                 font=font,
                 setting=self._settings.right,
                 control=self._controller.move_right
@@ -62,9 +63,9 @@ class SettingWindow(Window):
         )
         right_setting.activate()
 
-        left_setting = controls.RowSetting(
-            controls.Label(font, 'left'),
-            controls.Key(
+        left_setting = RowSetting(
+            Label(font, 'left'),
+            Key(
                 font=font,
                 setting=self._settings.left,
                 control=self._controller.move_left
@@ -72,9 +73,9 @@ class SettingWindow(Window):
             location=(50, 80)
         )
 
-        up_setting = controls.RowSetting(
-            controls.Label(font, 'up'),
-            controls.Key(
+        up_setting = RowSetting(
+            Label(font, 'up'),
+            Key(
                 font=font,
                 setting=self._settings.up,
                 control=self._controller.move_up
@@ -82,9 +83,9 @@ class SettingWindow(Window):
             location=(50, 110)
         )
 
-        down_setting = controls.RowSetting(
-            controls.Label(font, 'down'),
-            controls.Key(
+        down_setting = RowSetting(
+            Label(font, 'down'),
+            Key(
                 font=font,
                 setting=self._settings.down,
                 control=self._controller.move_down
@@ -103,61 +104,69 @@ class SettingWindow(Window):
         for control in self._controls:
             control.draw(self._screen)
 
-    def _event_handler(self, events):
-        for event in events:
-            self._change_active_setting(event)
-            self._change_key_value(event)
+    def _events_handler(self):
+        self._quit_if_user_wants_to_close_window()
+        self._change_active_setting()
+        self._change_key_value()
 
-    def _change_active_setting(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
-                self._selected_item_index += 1
-                if self._selected_item_index >= len(self._controls):
-                    self._selected_item_index = 0
-            elif event.key == pygame.K_UP:
-                self._selected_item_index -= 1
-                if self._selected_item_index < 0:
-                    self._selected_item_index = len(self._controls) - 1
+    def _quit_if_user_wants_to_close_window(self):
+        if not self._controller.quit.activated:
+            return
+        self.quit()
+
+    def _change_active_setting(self):
+        if self._controller.move_up.activated:
+            self._selected_item_index -= 1
+            if self._selected_item_index < 0:
+                self._selected_item_index = len(self._controls) - 1
+        elif self._controller.move_down.activated:
+            self._selected_item_index += 1
+            if self._selected_item_index >= len(self._controls):
+                self._selected_item_index = 0
+        else:
+            return
+
+        for i, setting in enumerate(self._controls):
+            if not isinstance(setting, RowSetting):
+                continue
+            if i == self._selected_item_index:
+                setting.activate()
             else:
+                setting.deactivate()
+
+    def _change_key_value(self):
+        if self._controller.accept.activated:
+            control = self._controls[self._selected_item_index]
+            if not isinstance(control, RowSetting):
                 return
-            for i, setting in enumerate(self._controls):
-                if not isinstance(setting, controls.RowSetting):
-                    continue
-                if i == self._selected_item_index:
-                    setting.activate()
-                else:
-                    setting.deactivate()
 
-    def _change_key_value(self, event):
-        if event.type != pygame.KEYDOWN:
-            return
-        if event.key != pygame.K_RETURN:
-            return
-        control = self._controls[self._selected_item_index]
-        if not isinstance(control, controls.RowSetting):
-            return
+            key_control = control.key
+            key_control.activate()
 
-        key_control = control.key
-        key_control.activate()
+            key_number = self._waiting_for_user_assign_new_key(
+                self._screen,
+                key_control
+            )
+            if key_number is None:
+                return
 
-        key_number = self._waiting_for_user_assign_new_key(self._screen, key_control)
-        if key_number is None:
-            return
+            key_control.change_text(pygame.key.name(key_number))
+            key_control._control.update_key_number(key_number)
 
-        key_control.change_text(pygame.key.name(key_number))
-        key_control._control.key_number = key_number
+            key_control._setting.value = key_number
+            self._settings.save()
 
-        key_control._setting.value = key_number
-        self._settings.save()
-
-        key_control.deactivate()
+            key_control.deactivate()
 
     def _waiting_for_user_assign_new_key(
-            self, screen, key_control: controls.Key) -> int | None:
-        # TODO: тут дохера логики,
+            self, screen, key_control: Key) -> int | None:
+        # TODO: Тут дохера логики,
         # и ивенты, и черчение рамки и апдейт экрана.
         # Надо подумать как это сделать лаконичней.
         while True:
+            # TODO: Использовать контроллер.
+            # Но чтобы это сделать,
+            # нужно чтобы контроллер смог отдать любую нажатую клавишу.
             for event in pygame.event.get():
                 if event.type != pygame.KEYDOWN:
                     continue
@@ -171,15 +180,21 @@ class SettingWindow(Window):
 
     def show(self):
         blue_color = (0, 49, 83)
+        fps = 30
+        clock = pygame.time.Clock()
+
         while self._is_showing:
             events = pygame.event.get()
-            self._quit_if_user_wants_to_close_window(events)
-            self._event_handler(events)
+            self._controller.conduct_survey_of_controls(events)
+            self._events_handler()
 
             self._screen.fill(blue_color)
             self._draw()
-
             pygame.display.update()
+
+            self._controller.deactivate_all_controls()
+            clock.tick(fps)
+
         self._is_showing = True
 
 
@@ -188,8 +203,8 @@ class GameWindow(Window):
             self,
             caption: str,
             size: tuple[int, int],
-            sprite: sprites.Sprite,
-            mover: controller.Mover):
+            sprite: Sprite,
+            mover: Mover):
         super().__init__(caption, size)
         self._sprite = sprite
         self._mover = mover
@@ -213,19 +228,22 @@ class GameWindow(Window):
         while self._is_showing:
             events = pygame.event.get()
             self._quit_if_user_wants_to_close_window(events)
+            self._mover._controller.conduct_survey_of_controls(events)
 
             self._move_all_objects()
             self._update_all_objects()
             self._draw_all(background_color=green)
 
+            self._mover._controller.deactivate_all_controls()
             pygame.display.update()
 
         self._is_showing = True
 
 
 class MenuWindow(Window):
-    def __init__(self, caption, size):
+    def __init__(self, caption, size, controller: Controller):
         super().__init__(caption, size)
+        self._controller = controller
         self.play_button_handlers = []
         self.settings_button_handlers = []
         self._initialize_components()
@@ -233,7 +251,7 @@ class MenuWindow(Window):
     def _initialize_components(self):
         font = pygame.font.SysFont('Consolas', 25)
 
-        button_play = controls.Button(
+        button_play = Button(
             font=font,
             text="play",
             antialias=False,
@@ -243,7 +261,7 @@ class MenuWindow(Window):
         button_play.add_click_handler(self._on_play_button_click)
         button_play.activate()
 
-        button_settings = controls.Button(
+        button_settings = Button(
             font=font,
             text="settings",
             antialias=False,
@@ -252,7 +270,7 @@ class MenuWindow(Window):
         )
         button_settings.add_click_handler(self._on_settings_button_click)
 
-        button_quit = controls.Button(
+        button_quit = Button(
             font=font,
             text="quit",
             antialias=False,
@@ -266,70 +284,79 @@ class MenuWindow(Window):
         self._controls.append(button_settings)
         self._controls.append(button_quit)
 
-    def _quit(self):
-        self._is_showing = False
-
     def _events_handler(self):
-        events = pygame.event.get()
-        self._quit_if_user_wants_to_close_window(events)
-        self._change_active_button(events)
-        self._click_on_button(events)
+        self._quit_if_user_wants_to_close_window()
+        self._change_active_button()
+        self._click_on_button()
 
-    def _click_on_button(self, events):
-        for event in events:
-            if event.type != pygame.KEYDOWN:
-                continue
-            if event.key != pygame.K_RETURN:
-                continue
-            control = self._controls[self._selected_item_index]
-            if not isinstance(control, controls.Button):
-                continue
+    def _quit_if_user_wants_to_close_window(self):
+        if not self._controller.quit.activated:
+            return
+        self.quit()
 
-            control.click()
+    def _click_on_button(self):
+        if not self._controller.accept.activated:
+            return
 
-    def _change_active_button(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    self._selected_item_index += 1
-                    if self._selected_item_index >= len(self._controls):
-                        self._selected_item_index = 0
-                elif event.key == pygame.K_UP:
-                    self._selected_item_index -= 1
-                    if self._selected_item_index < 0:
-                        self._selected_item_index = len(self._controls) - 1
-                else:
-                    return
-                for i, button in enumerate(self._controls):
-                    if not isinstance(button, controls.Button):
-                        continue
-                    if i == self._selected_item_index:
-                        button.activate()
-                    else:
-                        button.deactivate()
+        control = self._controls[self._selected_item_index]
+        if not isinstance(control, Button):
+            return
+
+        control.click()
+
+    def _change_active_button(self):
+        if self._controller.move_up.activated:
+            self._selected_item_index -= 1
+            if self._selected_item_index < 0:
+                self._selected_item_index = len(self._controls) - 1
+        elif self._controller.move_down.activated:
+            self._selected_item_index += 1
+            if self._selected_item_index >= len(self._controls):
+                self._selected_item_index = 0
+        else:
+            return
+
+        for i, control in enumerate(self._controls):
+            if not isinstance(control, Button):
+                continue
+            if i == self._selected_item_index:
+                control.activate()
+            else:
+                control.deactivate()
 
     def _draw(self):
         for control in self._controls:
             control.draw(self._screen)
 
     def _on_play_button_click(self):
+        self._controller.deactivate_all_controls()
         for handler in self.play_button_handlers:
             handler()
 
     def _on_settings_button_click(self):
+        self._controller.deactivate_all_controls()
         for handler in self.settings_button_handlers:
             handler()
 
     def _on_quit_button_click_handler(self):
-        self._quit()
+        self.quit()
 
     def show(self):
         gray_color = (156, 156, 156)
+        fps = 30
+        clock = pygame.time.Clock()
+
         while self._is_showing:
+            events = pygame.event.get()
+            self._controller.conduct_survey_of_controls(events)
             self._events_handler()
 
             self._screen.fill(gray_color)
             self._draw()
 
             pygame.display.update()
+
+            self._controller.deactivate_all_controls()
+            clock.tick(fps)
+
         self._is_showing = True

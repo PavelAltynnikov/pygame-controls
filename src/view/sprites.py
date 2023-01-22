@@ -1,11 +1,11 @@
 import pygame
 
 # сомневаюсь что тут должна быть эта зависимость
-import model
+from model import Character
 
 
 class Sprite:
-    def __init__(self, model: model.Character):
+    def __init__(self, model: Character):
         self.surface = pygame.Surface((100, 100))
         self.surface.fill((250, 50, 50))
         self.rect = self.surface.get_rect()
@@ -13,8 +13,8 @@ class Sprite:
         self._character = model
 
     def update(self):
-        self.rect.x = self._character.location.x
-        self.rect.y = self._character.location.y
+        self.rect.x = self._character.location.x  # type: ignore
+        self.rect.y = self._character.location.y  # type: ignore
 
     def draw(self, screen):
         screen.blit(self.surface, self.rect)

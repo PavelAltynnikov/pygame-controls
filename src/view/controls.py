@@ -4,8 +4,8 @@ from typing import Callable
 import pygame
 
 # Эти зависимости мешают тестировать модуль
-import settings
-import controller
+import controllers
+from settings import Setting
 
 
 class Control(ABC):
@@ -45,8 +45,8 @@ class Key(Label):
     def __init__(
             self,
             font,
-            setting: settings.Setting,
-            control: controller.Control,
+            setting: Setting,
+            control: controllers.Control,
             antialias=False,
             color=(0, 0, 0),
             location=(0, 0)):
@@ -103,7 +103,7 @@ class Button(Label):
         self.is_active = False
 
     def draw_frame(self, screen):
-        rect = self._surface.get_rect()
+        rect = self._surface.get_rect()  # type: ignore
         rect.topleft = self.location
 
         pygame.draw.rect(
