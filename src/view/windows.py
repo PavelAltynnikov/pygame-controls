@@ -181,7 +181,8 @@ class SettingsWindow(Window):
     def show(self):
         blue_color = (0, 49, 83)
         while self._is_showing:
-            self._controller.conduct_survey_of_controls()
+            events = pygame.event.get()
+            self._controller.conduct_survey_of_controls(events)
             self._events_handler()
 
             self._screen.fill(blue_color)
@@ -223,7 +224,7 @@ class GameWindow(Window):
         while self._is_showing:
             events = pygame.event.get()
             self._quit_if_user_wants_to_close_window(events)
-            self._mover._controller.conduct_survey_of_controls()
+            self._mover._controller.conduct_survey_of_controls(events)
 
             self._move_all_objects()
             self._update_all_objects()
@@ -339,7 +340,8 @@ class MenuWindow(Window):
     def show(self):
         gray_color = (156, 156, 156)
         while self._is_showing:
-            self._controller.conduct_survey_of_controls()
+            events = pygame.event.get()
+            self._controller.conduct_survey_of_controls(events)
             self._events_handler()
 
             self._screen.fill(gray_color)
