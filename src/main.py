@@ -1,7 +1,10 @@
 import pygame
 
 import view
-from controllers import PygameGamepad, PygameKeyboard, PygameIntermittentKeyboard
+from controllers import (
+    PygameGamepad, PygameIntermittentGamepad,
+    PygameKeyboard, PygameIntermittentKeyboard
+)
 from game_rules import Mover
 from model import Character, Point
 from settings import PygameKeyboardSettings, get_ui_settings
@@ -15,13 +18,17 @@ screen = pygame.display.set_mode(SCREEN_SIZE)
 
 character = Character(Point(300, 300))
 
-controller_settings = get_ui_settings(PygameKeyboardSettings)
 controller = PygameGamepad()
-controller = PygameKeyboard(controller_settings)
+# intermittent_controller = controller
+intermittent_controller = PygameIntermittentGamepad()
+
+controller_settings = get_ui_settings(PygameKeyboardSettings)
+# controller = PygameKeyboard(controller_settings)
+# intermittent_controller = PygameIntermittentKeyboard(controller_settings)
 # тут может быть проблема в том, что у одного из контроллеров не изменятся настройки
 # при изменении через свойства.
 # Да, проблема подтвердилась(.
-intermittent_controller = PygameIntermittentKeyboard(controller_settings)
+
 mover = Mover(controller)
 
 settings_window = view.windows.SettingsWindow(
