@@ -1,7 +1,8 @@
 import pygame
 
 from src.controllers import (
-    Controller, PygameKeyboard, PygameGamepad, PygameIntermittentKeyboard
+    Controller, PygameKeyboard, PygameIntermittentKeyboard,
+    PygameGamepad, PygameIntermittentGamepad
 )
 from src.settings import ControllerSettings, Setting
 
@@ -31,8 +32,9 @@ class Test:
         )
         self._controllers: list[Controller] = [
             PygameKeyboard(settings),
+            PygameGamepad(),
             PygameIntermittentKeyboard(settings),
-            PygameGamepad()
+            PygameIntermittentGamepad(),
         ]
         self._controller_index = 0
         self._controller = self._controllers[self._controller_index]
@@ -72,7 +74,6 @@ class Test:
         while not close_window:
             events = pygame.event.get()
             self._controller.conduct_survey_of_controls(events)
-
             if self._controller.quit.activated:
                 return
             self._change_controller()
