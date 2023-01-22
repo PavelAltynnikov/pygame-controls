@@ -187,6 +187,8 @@ class GamePadButton(Enum):
     RB = 5
     # элемента с номером 6 на моём Logitech F310 не оказалось
     START = 7
+    LS = 8
+    RS = 9
 
 
 class PygameGamepad(Controller):
