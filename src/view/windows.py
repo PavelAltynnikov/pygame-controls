@@ -339,6 +339,9 @@ class MenuWindow(Window):
 
     def show(self):
         gray_color = (156, 156, 156)
+        fps = 30
+        clock = pygame.time.Clock()
+
         while self._is_showing:
             events = pygame.event.get()
             self._controller.conduct_survey_of_controls(events)
@@ -350,5 +353,6 @@ class MenuWindow(Window):
             pygame.display.update()
 
             self._controller.deactivate_all_controls()
+            clock.tick(fps)
 
         self._is_showing = True
