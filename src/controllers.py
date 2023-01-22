@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame
 
-from .settings import ControllerSettings
+from settings import ControllerSettings
 
 
 class Control:
@@ -208,6 +208,20 @@ class PygameGamepad(Controller):
         self._accept = Control(GamePadButton.A.value)
         self._quit = Control(GamePadButton.B.value)
 
+    def deactivate_all_controls(self):
+        self._deactivate_axes()
+        self._deactivate_buttons()
+
+    def _deactivate_axes(self):
+        self._move_up.deactivate()
+        self._move_right.deactivate()
+        self._move_down.deactivate()
+        self._move_left.deactivate()
+
+    def _deactivate_buttons(self):
+        self._accept.deactivate()
+        self._quit.deactivate()
+
     def conduct_survey_of_controls(self, events) -> None:
         self._try_to_activate_stick_directions(
             axe=GamePadAxe.LEFT_STICK_X,
@@ -256,3 +270,62 @@ class PygameGamepad(Controller):
 
     def __str__(self):
         return self._game_pad.get_name()
+
+
+class PygameIntermittentGamepad(PygameGamepad):
+    def __init__(self):
+        super().__init__()
+        self._max_intermittent_frames = 30
+        self._current_frame = 0
+
+    def deactivate_axes(self):
+        """В данном классе деактивацией осей занимается другой метод
+        """
+        pass
+
+    def conduct_survey_of_controls(self, events) -> None:
+        super().conduct_survey_of_controls(events)
+
+    def _try_to_activate_stick_directions(
+        self,
+        positive_direction: Control,
+        negative_direction: Control,
+        axe: GamePadAxe
+    ) -> None:
+        """Стик должен активироваться единожды, даже если на физическом устройстве его
+        продолжают нажимать.
+        Через некоторое количество кадров он должен снова активироваться на один кадр.
+        Если на физическом устройстве его деактивировали, то счётчик кадров должен
+        сбросится и следующая активация физ устройства должна активировать стик.
+        """
+        value = self._game_pad.get_axis(axe.value)
+
+        if self._current_frame > 0:
+            positive_direction.deactivate()
+            negative_direction.deactivate()
+            # Тут есть проблема.
+            # Тут хорошо было бы проверить силу нажатия и если она меньше мёртвой зоны,
+            # то обнулить фреймы, чтобы счёт фреймов прекратился
+            # и можно было бы тут же использовать стик ещё раз,
+            # но так как здесь же проверяется вторая ось, то она может скинуть фреймы,
+            # в тот момент когда для первой оси это не нужно.
+            # Пример: X = 1, Y = 0.
+            # Активируем счётчик фреймов, но проверка нажатия оси Y сбросит его.
+        else:
+            if abs(value) <= self._dead_zone:
+                positive_direction.deactivate()
+                negative_direction.deactivate()
+                self._current_frame = 0
+                return
+
+            if value > 0:
+                positive_direction.activate(value)
+            else:
+                negative_direction.activate(value)
+
+        self._current_frame += 1
+        if self._current_frame == self._max_intermittent_frames:
+            self._current_frame = 0
+
+    def __str__(self):
+        return f"Intermittent {super().__str__()}"
