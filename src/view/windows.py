@@ -159,6 +159,9 @@ class SettingsWindow(Window):
                 return
 
             key_control.change_text(pygame.key.name(key_number))
+            # TODO: вот это полная хуйня из-за key_control._control
+            # но это решение было вызвано необходимостью связать
+            # элемент управления с UI элементом.
             key_control._control.update_key_number(key_number)
 
             key_control._setting.value = key_number
