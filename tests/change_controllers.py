@@ -1,5 +1,6 @@
 import pygame
 
+import setup  # noqa
 from src.controllers import (
     Controller, PygameKeyboard, PygameIntermittentKeyboard,
     PygameGamepad, PygameIntermittentGamepad
