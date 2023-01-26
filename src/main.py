@@ -18,13 +18,12 @@ screen = pygame.display.set_mode(SCREEN_SIZE)
 
 character = Character(Point(300, 300))
 
-controller = PygameGamepad()
-# intermittent_controller = controller
-intermittent_controller = PygameIntermittentGamepad()
+# controller = PygameGamepad()
+# intermittent_controller = PygameIntermittentGamepad()
 
 controller_settings = get_ui_settings(PygameKeyboardSettings)
-# controller = PygameKeyboard(controller_settings)
-# intermittent_controller = PygameIntermittentKeyboard(controller_settings)
+controller = PygameKeyboard(controller_settings)
+intermittent_controller = PygameIntermittentKeyboard(controller_settings)
 # тут может быть проблема в том, что у одного из контроллеров не изменятся настройки
 # при изменении через свойства.
 # Да, проблема подтвердилась(.
@@ -43,6 +42,7 @@ game_window = view.windows.GameWindow(
     size=SCREEN_SIZE,
     sprite=view.sprites.Sprite(character),
     mover=mover,
+    controller=controller
 )
 
 start_window = view.windows.MenuWindow(
