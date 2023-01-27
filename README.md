@@ -5,6 +5,8 @@
 ![Пакеты](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/packages.png)
 ## Классы
 ![Классы](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/classes.png)
+## Генерация
+`pyreverse -o png sandbox --output-directory diagrams`
 
 # Окружение
 ```
@@ -13,7 +15,7 @@
 ```
 
 ## Создание
-`py -3.10 -m venv env`
+`py -3.10 -m venv venv`
 
 ## Активация
 Windows
