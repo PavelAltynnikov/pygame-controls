@@ -2,9 +2,9 @@
 
 # Структура
 ## Пакеты
-![Пакеты](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/packages.png)
+![Пакеты](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/diagrams/packages.png)
 ## Классы
-![Классы](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/classes.png)
+![Классы](https://raw.githubusercontent.com/PavelAltynnikov/pygame-sandbox/master/diagrams/classes.png)
 ## Генерация
 `pyreverse -o png sandbox --output-directory diagrams`
 
