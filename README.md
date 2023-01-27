@@ -26,3 +26,11 @@ Linux
 
 ## Установка зависимостей
 `python -m pip install -r requirements.txt`
+
+# Запуск
+## Игра
+`python -m sandbox`
+
+## Тесты
+На текущий момент тесты мануальные.  
+`python tests/test_module_name.py`
