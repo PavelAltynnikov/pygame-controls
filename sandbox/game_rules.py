@@ -1,5 +1,5 @@
-from model import Character, Point
-from controllers import Controller
+from .model import Character, Point
+from .controllers import Controller
 
 
 class Mover:
