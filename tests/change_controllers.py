@@ -1,11 +1,11 @@
 import pygame
 
 import setup  # noqa
-from src.controllers import (
+from sandbox.controllers import (
     Controller, PygameKeyboard, PygameIntermittentKeyboard,
     PygameGamepad, PygameIntermittentGamepad
 )
-from src.settings import ControllerSettings, Setting
+from sandbox.settings import ControllerSettings, Setting
 
 pygame.init()
 

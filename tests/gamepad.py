@@ -1,7 +1,7 @@
 import pygame
 
 import setup  # noqa
-from src.controllers import GamePadAxe, GamePadButton  # type: ignore
+from sandbox.controllers import GamePadAxe, GamePadButton  # type: ignore
 
 
 class Text:
