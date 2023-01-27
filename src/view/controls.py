@@ -4,8 +4,8 @@ from typing import Callable
 import pygame
 
 # Эти зависимости мешают тестировать модуль
-import controllers
-from settings import Setting
+from src import controllers
+from src.settings import Setting
 
 
 class Control(ABC):

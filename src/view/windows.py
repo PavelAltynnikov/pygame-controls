@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-from controllers import Controller
-from settings import ControllerSettings
-from game_rules import Mover
-from .sprites import Sprite
-from .controls import Button, Control, Key, Label, RowSetting
+from src.controllers import Controller
+from src.settings import ControllerSettings
+from src.game_rules import Mover
+from src.view.sprites import Sprite
+from src.view.controls import Button, Control, Key, Label, RowSetting
 
 
 class Window(ABC):

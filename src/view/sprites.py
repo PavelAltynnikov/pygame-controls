@@ -1,7 +1,7 @@
 import pygame
 
 # сомневаюсь что тут должна быть эта зависимость
-from model import Character
+from src.model import Character
 
 
 class Sprite:

@@ -1,13 +1,13 @@
 import pygame
 
-import view
-from controllers import (
-    PygameGamepad, PygameIntermittentGamepad,
+from . import view
+from .controllers import (
+    # PygameGamepad, PygameIntermittentGamepad,
     PygameKeyboard, PygameIntermittentKeyboard
 )
-from game_rules import Mover
-from model import Character, Point
-from settings import PygameKeyboardSettings, get_ui_settings
+from .game_rules import Mover
+from .model import Character, Point
+from .settings import PygameKeyboardSettings, get_ui_settings
 
 
 SCREEN_SIZE = (1000, 500)
