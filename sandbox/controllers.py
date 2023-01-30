@@ -130,11 +130,11 @@ class PygameKeyboard(Controller):
         if keys[self._move_right.key_number]:
             self._move_right.activate()
         if keys[self._move_left.key_number]:
-            self._move_left.activate()
+            self._move_left.activate(-1)
         if keys[self._move_up.key_number]:
             self._move_up.activate()
         if keys[self._move_down.key_number]:
-            self._move_down.activate()
+            self._move_down.activate(-1)
         if keys[self._accept.key_number]:
             self._accept.activate()
         if keys[self._quit.key_number]:
@@ -155,11 +155,11 @@ class PygameIntermittentKeyboard(PygameKeyboard):
             if self._move_right.key_number == event.key:
                 self._move_right.activate()
             elif self._move_left.key_number == event.key:
-                self._move_left.activate()
+                self._move_left.activate(-1)
             elif self._move_up.key_number == event.key:
                 self._move_up.activate()
             elif self._move_down.key_number == event.key:
-                self._move_down.activate()
+                self._move_down.activate(-1)
             if self._accept.key_number == event.key:
                 self._accept.activate()
             elif self._quit.key_number == event.key:
