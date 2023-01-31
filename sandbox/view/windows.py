@@ -218,7 +218,12 @@ class GameWindow(Window):
 
     def _move_all_objects(self):
         # TODO: вот это полная хуйня из-за _sprite._character
-        self._mover.move_character(character=self._sprite._character)
+        character = self._sprite._character
+
+        if character.location.y >= self._size[1] - 100:
+            self._mover.reset(character)
+
+        self._mover.move_character(character=character)
 
     def _update_all_objects(self):
         self._sprite.update()

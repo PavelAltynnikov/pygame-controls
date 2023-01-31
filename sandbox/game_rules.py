@@ -1,30 +1,36 @@
-from .model import Character, Point
+from .model import Character
 from .controllers import Controller
 
 
 class Mover:
     def __init__(self, controller: Controller):
         self._controller = controller
+        self._gravitation = 0.005
+        self._start_speed = -1.5
+        self._current_speed = 0
 
     def move_character(self, character: Character):
-        speed = 0
-        character.move_to(
-            Point(
-                x=self._get_new_x(character.location.x, speed),
-                y=self._get_new_y(character.location.y, speed)
-            )
-        )
+        character.change_x(self._calculate_x(speed=0))
+        character.change_y(self._calculate_y(character))
 
-    def _get_new_x(self, start_x: float, speed: float) -> float:
+    def reset(self, character: Character):
+        self._current_speed = 0
+        character.is_jumping = False
+
+    def _calculate_x(self, speed: float) -> float:
         if self._controller.move_right.activated:
-            return start_x + self._controller.move_right.value + speed
+            return self._controller.move_right.value + speed
         if self._controller.move_left.activated:
-            return start_x - abs(self._controller.move_left.value) - speed
-        return start_x
+            return self._controller.move_left.value - speed
+        return 0
 
-    def _get_new_y(self, start_y: float, speed: float) -> float:
-        if self._controller.move_up.activated:
-            return start_y - abs(self._controller.move_up.value) - speed
-        if self._controller.move_down.activated:
-            return start_y + self._controller.move_down.value + speed
-        return start_y
+    def _calculate_y(self, character: Character) -> float:
+        if self._controller.move_up.activated and not character.is_jumping:
+            self._current_speed = self._start_speed
+            character.is_jumping = True
+        elif character.is_jumping:
+            self._current_speed += self._gravitation
+        else:
+            self._current_speed = 0
+
+        return self._current_speed

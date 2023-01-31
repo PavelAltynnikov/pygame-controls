@@ -7,7 +7,8 @@ class Point:
 class Character:
     def __init__(self, start_point: Point):
         self._location = start_point
-        self.is_jumping = False
+        # немного не интуитивно, но надо подумать об этом ещё раз.
+        self.is_jumping = True
 
     @property
     def location(self) -> Point:
